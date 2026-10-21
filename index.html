@@ -2,46 +2,48 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Тренажёр: Имитационное моделирование</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Имитационное моделирование | Тренажёр</title>
     <style>
         :root {
-            --primary: #4a90e2;
-            --bg: #f4f7f6;
-            --card-bg: #ffffff;
-            --text: #333333;
-            --text-light: #666666;
-            --success: #2ecc71;
-            --success-bg: #d5f5e3;
-            --error: #e74c3c;
-            --error-bg: #fadbd8;
-            --border: #ddd;
+            --bg: #090909;
+            --card: #141414;
+            --card-secondary: #1B1B1B;
+            --surface: #222222;
+            --text: #FFFFFF;
+            --text-muted: #A3A3A3;
+            --border: rgba(255,255,255,0.12);
+            --border-active: rgba(255,255,255,0.35);
+            --success: #34C759;
+            --success-bg: rgba(52, 199, 89, 0.15);
+            --error: #FF3B30;
+            --error-bg: rgba(255, 59, 48, 0.15);
+            --radius: 12px;
+            --radius-lg: 20px;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
             background-color: var(--bg);
             color: var(--text);
             line-height: 1.5;
-            padding: 20px 10px;
             display: flex;
             justify-content: center;
+            align-items: flex-start;
             min-height: 100vh;
+            padding: 20px 16px;
         }
 
         #app {
             width: 100%;
-            max-width: 800px;
-            background: var(--card-bg);
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            padding: 20px;
+            max-width: 760px;
             display: flex;
             flex-direction: column;
             gap: 20px;
@@ -49,40 +51,207 @@
 
         .hidden { display: none !important; }
 
-        /* Header & Progress */
-        .header {
+        /* Typography */
+        h1, h2, h3, h4 { font-weight: 600; letter-spacing: -0.02em; }
+        h1 { font-size: 28px; margin-bottom: 8px; text-align: center; }
+        h2 { font-size: 22px; margin-bottom: 16px; text-align: center; }
+        p { color: var(--text-muted); font-size: 15px; }
+
+        /* Header */
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .logo-text {
+            font-weight: 700;
+            font-size: 18px;
+            letter-spacing: -0.5px;
+        }
+
+        .header-nav {
+            display: flex;
+            gap: 12px;
+        }
+
+        /* Buttons */
+        button {
+            border: none;
+            border-radius: var(--radius);
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            outline: none;
+            padding: 12px 20px;
+        }
+
+        button:active { transform: scale(0.98); }
+
+        .btn-primary {
+            background: var(--text);
+            color: var(--bg);
+        }
+        .btn-primary:hover { background: #e0e0e0; }
+        .btn-primary:disabled { background: #333; color: #666; cursor: not-allowed; }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+        .btn-secondary:hover { border-color: var(--border-active); background: var(--surface); }
+        .btn-secondary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .btn-text {
+            background: transparent;
+            color: var(--text-muted);
+            padding: 8px 12px;
+            font-size: 14px;
+        }
+        .btn-text:hover { color: var(--text); }
+
+        .btn-danger {
+            background: transparent;
+            color: var(--error);
+            border: 1px solid var(--error);
+        }
+        .btn-danger:hover { background: var(--error-bg); }
+
+        /* Menu Screen */
+        .menu-card {
+            background: var(--card);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            border: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        @media (max-width: 600px) {
+            .menu-grid { grid-template-columns: 1fr; }
+        }
+
+        .stats-panel {
+            background: var(--card-secondary);
+            border-radius: var(--radius);
+            padding: 16px;
+            border: 1px solid var(--border);
+            font-size: 14px;
+        }
+        
+        .stats-panel ul { list-style: none; margin-top: 10px; display: flex; flex-direction: column; gap: 6px; }
+        .stats-panel li { display: flex; justify-content: space-between; color: var(--text-muted); }
+        .stats-panel li span { color: var(--text); font-weight: 600; }
+
+        .topic-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .topic-list label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            font-size: 15px;
+        }
+        .topic-list input[type="checkbox"] {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border-active);
+            border-radius: 4px;
+            background: transparent;
+            cursor: pointer;
+            position: relative;
+        }
+        .topic-list input[type="checkbox"]:checked {
+            background: var(--text);
+            border-color: var(--text);
+        }
+        .topic-list input[type="checkbox"]:checked::after {
+            content: '';
+            position: absolute;
+            top: 2px; left: 6px;
+            width: 5px; height: 10px;
+            border: solid var(--bg);
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+
+        /* Quiz Screen */
+        .quiz-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             font-size: 14px;
-            color: var(--text-light);
-            border-bottom: 1px solid var(--border);
-            padding-bottom: 10px;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+        }
+
+        .progress-container {
+            width: 100%;
+            height: 4px;
+            background: var(--border);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-bottom: 24px;
         }
 
         .progress-bar {
-            width: 100%;
-            height: 8px;
-            background: #eee;
-            border-radius: 4px;
-            overflow: hidden;
-            margin-top: 10px;
-        }
-
-        .progress-fill {
             height: 100%;
-            background: var(--primary);
+            background: var(--text);
             width: 0%;
             transition: width 0.3s ease;
         }
 
-        /* Question Area */
-        .question-text {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 15px;
+        .tags-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
         }
 
+        .tag {
+            font-size: 12px;
+            background: var(--surface);
+            padding: 4px 10px;
+            border-radius: 12px;
+            color: var(--text-muted);
+            border: 1px solid var(--border);
+        }
+
+        .hard-btn.active {
+            color: #FFD60A;
+            border-color: #FFD60A;
+            background: rgba(255, 214, 10, 0.1);
+        }
+
+        .question-text {
+            font-size: 20px;
+            font-weight: 500;
+            line-height: 1.4;
+            margin-bottom: 24px;
+        }
+
+        /* Options */
         .options-container {
             display: flex;
             flex-direction: column;
@@ -90,250 +259,353 @@
         }
 
         .option-btn {
-            background: #fff;
-            border: 2px solid var(--border);
-            border-radius: 8px;
-            padding: 12px 15px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 16px;
             text-align: left;
             font-size: 16px;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.2s ease;
             color: var(--text);
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
+            width: 100%;
         }
 
-        .option-btn:hover {
-            border-color: var(--primary);
+        .option-btn:hover:not(:disabled) {
+            border-color: var(--border-active);
+            background: var(--card-secondary);
         }
 
         .option-btn.selected {
-            border-color: var(--primary);
-            background: #e3f2fd;
+            border-color: var(--text);
+            background: var(--surface);
         }
 
         .option-btn.correct {
             border-color: var(--success);
             background: var(--success-bg);
+            color: var(--success);
         }
 
         .option-btn.incorrect {
             border-color: var(--error);
             background: var(--error-bg);
+            color: var(--error);
         }
-        
+
         .option-btn.disabled {
-            cursor: not-allowed;
+            cursor: default;
         }
 
-        .marker {
-            font-weight: bold;
+        .checkbox-mock {
             width: 20px;
+            height: 20px;
+            border: 2px solid var(--border-active);
+            border-radius: 4px;
+            flex-shrink: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.2s;
         }
 
-        .marker.correct { color: var(--success); }
-        .marker.incorrect { color: var(--error); }
+        .option-btn.selected .checkbox-mock {
+            background: var(--text);
+            border-color: var(--text);
+        }
+        .option-btn.selected .checkbox-mock::after {
+            content: '✓';
+            color: var(--bg);
+            font-size: 14px;
+            font-weight: bold;
+        }
 
-        /* Select & Matching */
+        .option-btn.correct .checkbox-mock { border-color: var(--success); background: var(--success); }
+        .option-btn.correct .checkbox-mock::after { content: '✓'; color: #000; font-size: 14px; font-weight: bold; }
+        .option-btn.incorrect .checkbox-mock { border-color: var(--error); background: var(--error); }
+        .option-btn.incorrect .checkbox-mock::after { content: '✕'; color: #000; font-size: 12px; font-weight: bold; }
+
+        .marker-icon {
+            font-size: 16px;
+            font-weight: bold;
+            margin-left: auto;
+        }
+
+        /* Dropdowns & Matching */
         select {
             width: 100%;
-            padding: 10px;
-            border-radius: 6px;
-            border: 2px solid var(--border);
+            padding: 14px 16px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            color: var(--text);
             font-size: 16px;
-            margin-bottom: 10px;
-            background: #fff;
+            outline: none;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23A3A3A3' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+            background-size: 16px;
+            transition: border-color 0.2s;
         }
 
-        .match-row {
+        select:focus { border-color: var(--border-active); }
+        select:disabled { opacity: 0.7; cursor: default; }
+        select.correct-select { border-color: var(--success); background-color: var(--success-bg); }
+        select.incorrect-select { border-color: var(--error); background-color: var(--error-bg); }
+
+        .dropdown-block { margin-bottom: 12px; }
+        .dropdown-hint { font-size: 13px; color: var(--success); margin-top: 4px; display: block; }
+
+        .match-row, .sequence-row {
             display: flex;
-            gap: 10px;
+            gap: 12px;
             align-items: center;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
+            background: var(--card-secondary);
+            padding: 12px;
+            border-radius: var(--radius);
+            border: 1px solid transparent;
         }
 
-        .match-row select {
-            margin-bottom: 0;
+        .match-row .term, .sequence-row .text {
             flex: 1;
-        }
-
-        .match-row .term {
-            flex: 1;
-            font-weight: 600;
-        }
-
-        .sequence-row {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-
-        .sequence-row .text {
-            flex: 1;
-        }
-        
-        .sequence-row .num-select {
-            width: 60px;
-            flex-shrink: 0;
-        }
-
-        /* Feedback & Actions */
-        .feedback {
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 15px;
             font-size: 15px;
         }
 
-        .feedback.correct { background: var(--success-bg); border-left: 4px solid var(--success); }
-        .feedback.incorrect { background: var(--error-bg); border-left: 4px solid var(--error); }
-
-        .actions {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            margin-top: 20px;
-            border-top: 1px solid var(--border);
-            padding-top: 20px;
-        }
-
-        button {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: background 0.2s;
-            color: #fff;
-            background: var(--primary);
+        .match-row select, .sequence-row select {
             flex: 1;
             min-width: 120px;
+            padding: 10px 12px;
+            font-size: 14px;
         }
 
-        button:hover { opacity: 0.9; }
-        button:disabled { background: #ccc; cursor: not-allowed; }
+        .sequence-row select.num-select { flex: none; width: 70px; }
         
-        .btn-secondary { background: #95a5a6; }
-        .btn-danger { background: var(--error); }
+        .match-row.has-error, .sequence-row.has-error { border-color: var(--error); }
+        .match-row.is-correct, .sequence-row.is-correct { border-color: var(--success); }
 
-        /* Menu Screen */
-        .menu-grid {
+        /* Feedback */
+        .feedback-box {
+            padding: 16px;
+            border-radius: var(--radius);
+            margin-top: 20px;
+            font-size: 15px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .feedback-box.correct { background: var(--success-bg); border: 1px solid rgba(52, 199, 89, 0.3); }
+        .feedback-box.incorrect { background: var(--error-bg); border: 1px solid rgba(255, 59, 48, 0.3); }
+        
+        .feedback-title { font-weight: 600; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
+        .feedback-title.correct { color: var(--success); }
+        .feedback-title.incorrect { color: var(--error); }
+        .feedback-text { color: var(--text-muted); font-size: 14px; }
+
+        /* Actions */
+        .actions-bar {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+            flex-wrap: wrap;
+        }
+
+        .actions-bar button { flex: 1; min-width: 120px; }
+
+        /* Results */
+        .result-main {
+            text-align: center;
+            padding: 32px 20px;
+            background: var(--card);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+            margin-bottom: 20px;
+        }
+
+        .result-percent {
+            font-size: 64px;
+            font-weight: 700;
+            letter-spacing: -2px;
+            line-height: 1;
+            margin-bottom: 8px;
+        }
+
+        .result-subtitle { color: var(--text-muted); font-size: 16px; }
+
+        .result-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 24px;
         }
 
         @media (max-width: 600px) {
-            .menu-grid { grid-template-columns: 1fr; }
+            .result-grid { grid-template-columns: 1fr 1fr; }
         }
 
-        .stats-box {
-            background: #f9f9f9;
-            padding: 15px;
-            border-radius: 8px;
+        .result-item {
+            background: var(--card);
+            padding: 16px;
+            border-radius: var(--radius);
             border: 1px solid var(--border);
-            font-size: 14px;
+            text-align: center;
         }
-        
-        .stats-box ul {
-            margin-top: 10px;
-            padding-left: 20px;
-        }
-        
-        .stats-box li { margin-bottom: 5px; }
 
-        .topic-list label {
-            display: block;
-            margin-bottom: 10px;
+        .result-item .val { font-size: 24px; font-weight: 700; }
+        .result-item .lbl { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; }
+
+        .error-list {
+            background: var(--card);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            border: 1px solid var(--border);
+        }
+        
+        .error-list h4 { margin-bottom: 16px; }
+        
+        .error-item {
+            padding: 16px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        .error-item:last-child { border-bottom: none; }
+        .error-q { font-weight: 500; margin-bottom: 8px; }
+        .error-ans { font-size: 14px; color: var(--text-muted); display: flex; flex-direction: column; gap: 4px; }
+        .error-ans span.correct { color: var(--success); }
+
+        /* Utilities */
+        .spacer { height: 10px; }
+        .mt-20 { margin-top: 20px; }
+        .w-100 { width: 100%; }
+        
+        details summary {
             cursor: pointer;
+            padding: 12px;
+            background: var(--card-secondary);
+            border-radius: var(--radius);
+            font-weight: 500;
+            list-style: none;
         }
-        .topic-list input[type="checkbox"] {
-            margin-right: 8px;
-        }
-
-        .tag {
-            font-size: 12px;
-            background: #eee;
-            padding: 4px 8px;
-            border-radius: 12px;
-            margin-left: 10px;
-            vertical-align: middle;
-        }
-
-        .tag-hard { background: #ffca28; color: #333; }
+        details summary::-webkit-details-marker { display: none; }
+        details[open] summary { border-bottom-left-radius: 0; border-bottom-right-radius: 0; margin-bottom: 0; }
+        details > div { padding: 12px; background: var(--card); border: 1px solid var(--border); border-top: none; border-bottom-left-radius: var(--radius); border-bottom-right-radius: var(--radius); }
     </style>
 </head>
 <body>
 
 <div id="app">
+    <!-- Top Bar -->
+    <div class="top-bar">
+        <div class="logo-text">ИМ · Тренажёр</div>
+        <div class="header-nav">
+            <button class="btn-text" onclick="showMenu()">Меню</button>
+        </div>
+    </div>
+
     <!-- MENU SCREEN -->
-    <div id="menu-screen">
-        <h2 style="text-align: center; margin-bottom: 10px;">Имитационное моделирование</h2>
-        <p style="text-align: center; color: var(--text-light); margin-bottom: 20px; font-size: 14px;">Интерактивный тренажёр для запоминания</p>
-        
-        <div class="menu-grid">
-            <button onclick="startMode('all')">Все вопросы</button>
-            <button onclick="startMode('errors')">Работа над ошибками</button>
-            <button onclick="startMode('hard')">Сложные вопросы</button>
-            <button onclick="startMode('exam')">Экзамен</button>
-        </div>
+    <div id="menu-screen" class="hidden">
+        <div class="menu-card">
+            <h1>Имитационное моделирование</h1>
+            <p style="text-align: center; margin-bottom: 16px;">Интерактивный тренажёр для запоминания материала</p>
+            
+            <div class="menu-grid">
+                <button class="btn-primary" onclick="startMode('all')">Все вопросы</button>
+                <button class="btn-secondary" onclick="startMode('errors')">Работа над ошибками</button>
+                <button class="btn-secondary" onclick="startMode('hard')">Сложные вопросы</button>
+                <button class="btn-secondary" onclick="startMode('exam')">Режим экзамена</button>
+            </div>
 
-        <div style="margin-top: 15px;">
+            <div class="spacer"></div>
+
             <details>
-                <summary style="cursor: pointer; font-weight: 600; padding: 10px; background: #eee; border-radius: 8px;">Выбрать темы для повторения</summary>
-                <div class="topic-list" id="topic-list" style="margin-top: 10px; padding: 10px; background: #f9f9f9; border-radius: 8px;">
-                    <!-- Заполняется через JS -->
+                <summary>Выбрать темы для повторения</summary>
+                <div>
+                    <div class="topic-list" id="topic-list">
+                        <!-- JS generated -->
+                    </div>
+                    <button class="btn-primary w-100 mt-20" onclick="startMode('topics')">Начать по выбранным темам</button>
                 </div>
-                <button onclick="startMode('topics')" style="margin-top: 10px;">Начать по выбранным темам</button>
             </details>
-        </div>
 
-        <div class="stats-box" id="global-stats" style="margin-top: 20px;">
-            <!-- Заполняется через JS -->
-        </div>
+            <div class="stats-panel" id="global-stats">
+                <!-- JS generated -->
+            </div>
 
-        <button onclick="resetProgress()" class="btn-danger" style="margin-top: 20px; width: 100%;">Сбросить весь прогресс</button>
+            <button class="btn-danger w-100 mt-20" onclick="resetProgress()">Сбросить весь прогресс</button>
+        </div>
     </div>
 
     <!-- QUIZ SCREEN -->
     <div id="quiz-screen" class="hidden">
-        <div class="header">
+        <div class="quiz-header">
             <span id="q-counter">Вопрос 1 из 10</span>
-            <button id="btn-finish" class="btn-secondary" style="padding: 5px 10px; font-size: 12px; flex: none; min-width: auto;" onclick="finishEarly()">Завершить</button>
+            <button class="btn-text" onclick="finishEarly()">Завершить</button>
         </div>
-        <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+        <div class="progress-container">
+            <div class="progress-bar" id="progress-fill"></div>
+        </div>
         
-        <div style="display: flex; justify-content: space-between; margin-top: 10px;">
+        <div class="tags-row">
             <span class="tag" id="q-topic">Тема</span>
-            <button id="btn-hard" onclick="toggleHard()" style="padding: 2px 8px; font-size: 12px; flex: none; background: transparent; color: var(--text-light); border: 1px solid var(--border);">Отметить сложным</button>
+            <button class="btn-text tag hard-btn" id="btn-hard" onclick="toggleHard()">Отметить сложным</button>
         </div>
 
         <div class="question-text" id="q-text">Текст вопроса</div>
         <div id="q-input-area"></div>
         
-        <div class="feedback hidden" id="feedback-box"></div>
+        <div class="feedback-box hidden" id="feedback-box"></div>
 
-        <div class="actions">
-            <button id="btn-prev" onclick="prevQuestion()" class="btn-secondary">Назад</button>
-            <button id="btn-skip" onclick="skipQuestion()" class="btn-secondary">Пропустить</button>
-            <button id="btn-check" onclick="checkAnswer()" class="hidden">Проверить</button>
-            <button id="btn-next" onclick="nextQuestion()" class="hidden">Далее</button>
+        <div class="actions-bar">
+            <button class="btn-secondary" id="btn-prev" onclick="prevQuestion()">Назад</button>
+            <button class="btn-secondary" id="btn-skip" onclick="skipQuestion()">Пропустить</button>
+            <button class="btn-primary hidden" id="btn-check" onclick="checkCurrentAnswer()">Проверить</button>
+            <button class="btn-primary hidden" id="btn-next" onclick="nextQuestion()">Далее</button>
         </div>
     </div>
 
     <!-- RESULTS SCREEN -->
     <div id="results-screen" class="hidden">
-        <h2 style="text-align: center; margin-bottom: 20px;">Результаты</h2>
-        <div class="stats-box" id="result-stats"></div>
-        <div id="result-errors" style="margin-top: 20px;"></div>
+        <div class="result-main">
+            <div class="result-percent" id="res-percent">0%</div>
+            <div class="result-subtitle" id="res-subtitle">Результат</div>
+        </div>
         
-        <div class="actions" style="margin-top: 20px;">
-            <button onclick="startMode('errors')">Повторить ошибки</button>
-            <button onclick="startMode('all')">Пройти заново</button>
-            <button onclick="showMenu()" class="btn-secondary">В меню</button>
+        <div class="result-grid">
+            <div class="result-item">
+                <div class="val" id="res-correct">0</div>
+                <div class="lbl">Верно</div>
+            </div>
+            <div class="result-item">
+                <div class="val" id="res-incorrect">0</div>
+                <div class="lbl">Ошибки</div>
+            </div>
+            <div class="result-item">
+                <div class="val" id="res-skipped">0</div>
+                <div class="lbl">Пропущено</div>
+            </div>
+            <div class="result-item">
+                <div class="val" id="res-unchecked">0</div>
+                <div class="lbl">Не проверено</div>
+            </div>
+        </div>
+
+        <div class="error-list hidden" id="result-errors-container">
+            <h4>Разбор ошибок</h4>
+            <div id="result-errors"></div>
+        </div>
+        
+        <div class="actions-bar" style="margin-top: 24px;">
+            <button class="btn-secondary" onclick="startMode('errors')">Повторить ошибки</button>
+            <button class="btn-primary" onclick="startMode('all')">Пройти заново</button>
+            <button class="btn-secondary" onclick="showMenu()">В меню</button>
         </div>
     </div>
 </div>
@@ -341,139 +613,130 @@
 <script>
     // --- БАЗА ВОПРОСОВ ---
     const QUESTIONS = [
-        // --- Тема 1: Основные понятия ---
         {
             id: 1, topic: "Основные понятия", type: "single",
             text: "Что определяется как «сущность в виртуальном пространстве, обладающая определенным состоянием и поведением, имеющая заданные значения свойств (атрибутов) и операций над ними»?",
             options: ["Объект", "Класс", "Система", "Агент"],
-            correct: 0,
+            correct: "Объект",
             explanation: "Слайд 3. Именно такое определение даётся понятию «Объект» в объектно-ориентированном подходе."
         },
         {
             id: 2, topic: "Основные понятия", type: "single",
             text: "Как называется простейшая неделимая часть системы, свойства которой определяются конкретной задачей?",
             options: ["Компонент", "Элемент", "Подсистема", "Структура"],
-            correct: 1,
+            correct: "Элемент",
             explanation: "Слайд 5. Элемент — простейшая неделимая часть. Компонент — объединение элементов (масштаб меньше системы)."
         },
         {
             id: 3, topic: "Основные понятия", type: "single",
             text: "Что из перечисленного НЕ относится к свойствам, которыми должен обладать объект, считающийся системой?",
             options: ["Целостность", "Делимость", "Стохастичность", "Эмерджентность"],
-            correct: 2,
+            correct: "Стохастичность",
             explanation: "Слайд 4. Свойства системы: целостность, делимость, наличие устойчивых связей, организация и эмерджентность. Стохастичность не является обязательным свойством."
         },
         {
             id: 4, topic: "Основные понятия", type: "multi",
             text: "Выберите все характеристики, которые относятся к понятию «Процесс» (слайд 10):",
             options: ["Логически связанный набор работ", "Мгновенное изменение состояния", "Характеризуется длительностью и потребляемыми ресурсами", "Имеет нулевую длительность"],
-            correct: [0, 2],
+            correct: ["Логически связанный набор работ", "Характеризуется длительностью и потребляемыми ресурсами"],
             explanation: "Слайд 10. Процесс — логически связанный набор работ, характеризуется длительностью, результатом, ресурсами, условиями запуска/остановки. Мгновенное изменение — это событие (слайд 12)."
         },
         {
             id: 5, topic: "Основные понятия", type: "single",
             text: "Что представляет собой «Транзакт» в имитационном моделировании?",
             options: ["Сообщение (заявка на обслуживание), поступающее извне", "Мгновенное изменение состояния системы", "Единичное действие по обработке данных", "Совокупность устойчивых связей"],
-            correct: 0,
+            correct: "Сообщение (заявка на обслуживание), поступающее извне",
             explanation: "Слайд 13. Транзакт — это сообщение (заявка на обслуживание), проходящее по системе и активирующее процессы."
         },
-        
-        // --- Тема 2: Классификация систем ---
         {
             id: 6, topic: "Классификация систем", type: "single",
             text: "Согласно классификации по числу элементов, к какому классу относятся системы с количеством элементов 10⁴–10⁷?",
             options: ["Малые", "Сложные", "Ультрасложные", "Суперсистемы"],
-            correct: 1,
+            correct: "Сложные",
             explanation: "Слайд 6. Малые (10-10³), Сложные (10⁴-10⁷), Ультрасложные (10⁸-10³⁰), Суперсистемы (10³⁰-10²⁰⁰)."
         },
         {
             id: 7, topic: "Классификация систем", type: "multi",
             text: "Какие особенности характерны для больших систем? (Выберите все верные)",
             options: ["Большое количество элементов", "Иерархичность структуры управления", "Наличие человека в контуре управления", "Отсутствие взаимосвязей между элементами"],
-            correct: [0, 1, 2],
+            correct: ["Большое количество элементов", "Иерархичность структуры управления", "Наличие человека в контуре управления"],
             explanation: "Слайд 7. Особенности больших систем: большое количество элементов, взаимосвязь и взаимодействие, иерархичность, наличие человека и принятие решений в условиях неопределенности."
         },
-        
-        // --- Тема 3: Виды моделирования ---
         {
             id: 8, topic: "Виды моделирования", type: "single",
             text: "Какой вид моделирования представляет собой «процесс описания информации об объекте с помощью формализованных, неформализованных языков, образно-иллюстративных материалов»?",
             options: ["Физическое", "Концептуальное (информационное)", "Математическое", "Компьютерное"],
-            correct: 1,
+            correct: "Концептуальное (информационное)",
             explanation: "Слайд 19. Концептуальное (информационное) моделирование — это описание информации об объекте."
         },
         {
             id: 9, topic: "Виды моделирования", type: "single",
             text: "В чем отличие имитационного моделирования от аналитического?",
             options: ["Аналитическое использует формулы и уравнения, а имитационное — программу для компьютера", "Аналитическое всегда точнее имитационного", "Имитационное не позволяет прогнозировать поведение системы", "Аналитическое применимо только для сложных систем"],
-            correct: 0,
+            correct: "Аналитическое использует формулы и уравнения, а имитационное — программу для компьютера",
             explanation: "Слайд 21-23. Аналитическое — формулы, уравнения. Имитационное — разработка модели в виде программы и проведение экспериментов с ней."
         },
         {
             id: 10, topic: "Виды моделирования", type: "single",
             text: "Какой метод моделирования основан на многократном воспроизведении процесса для вычисления статистических характеристик случайных процессов?",
             options: ["Метод Монте-Карло", "Метод системной динамики", "Агентное моделирование", "Дискретно-событийное моделирование"],
-            correct: 0,
+            correct: "Метод Монте-Карло",
             explanation: "Слайд 25. Статистическое (численное) моделирование изначально базируется на методе Монте-Карло (метод статистических испытаний)."
         },
         {
             id: 11, topic: "Виды моделирования", type: "multi",
             text: "Какие из перечисленных методов относятся к разновидностям имитационного моделирования? (Выберите все)",
             options: ["Системная динамика", "Агентное моделирование", "Когнитивное моделирование", "Линейное программирование"],
-            correct: [0, 1, 2],
+            correct: ["Системная динамика", "Агентное моделирование", "Когнитивное моделирование"],
             explanation: "Слайд 24. Разновидности ИМ: статистическое, динамических систем, системная динамика, дискретно-событийное, агентное, когнитивное, ситуационное, экспертное."
         },
         {
             id: 12, topic: "Виды моделирования", type: "single",
             text: "Кто является автором парадигмы системной динамики, использующей графические диаграммы причинных связей?",
             options: ["Джефри Гордон", "Джей Форрестер", "Р. Аксельрод", "Джон фон Нейман"],
-            correct: 1,
+            correct: "Джей Форрестер",
             explanation: "Слайд 35 (фото) и контекст. Системная динамика (System Dynamics) была создана Джейем Форрестером (Jay Forrester). Джефри Гордон создал GPSS."
         },
         {
             id: 13, topic: "Виды моделирования", type: "single",
             text: "В чем суть агентного моделирования?",
             options: ["В исследовании работы децентрализованных агентов и того, как их поведение определяет поведение всей системы", "В построении графических диаграмм причинных связей", "В описании функционирования системы из одного состояния в другое", "В использовании формул и уравнений для нахождения решения"],
-            correct: 0,
+            correct: "В исследовании работы децентрализованных агентов и того, как их поведение определяет поведение всей системы",
             explanation: "Слайд 38. Агентное моделирование исследует децентрализованных агентов и их влияние на систему."
         },
         {
             id: 14, topic: "Виды моделирования", type: "single",
             text: "Какой вид моделирования основан на идеях теории искусственного интеллекта и используется для управления сложными техническими и организационными системами?",
             options: ["Ситуационное моделирование", "Когнитивное моделирование", "Дискретно-событийное моделирование", "Статистическое моделирование"],
-            correct: 0,
+            correct: "Ситуационное моделирование",
             explanation: "Слайд 45. Ситуационное моделирование — метод управления сложными системами, основанный на идеях ИИ."
         },
-        
-        // --- Тема 4: Дискретно-событийное и системная динамика ---
         {
             id: 15, topic: "Дискретно-событийное", type: "single",
             text: "Кто спроектировал и реализовал на IBM систему дискретно-событийного программирования GPSS в 1960 году?",
             options: ["Джефри Гордон", "Джей Форрестер", "Р. Аксельрод", "Джон фон Нейман"],
-            correct: 0,
+            correct: "Джефри Гордон",
             explanation: "Слайд 33. Джефри Гордон, 1960 г., GPSS (Global Purpose Simulation System)."
         },
         {
             id: 16, topic: "Дискретно-событийное", type: "single",
             text: "Что моделируется в дискретно-событийном подходе?",
             options: ["Время события", "Непрерывное изменение поведения во времени", "Поведение отдельных агентов", "Пространственное перемещение объектов"],
-            correct: 0,
+            correct: "Время события",
             explanation: "Слайд 2. AnyLogic: дискретно-событийное (моделируется время события), агентное (поведение), системная динамика (изменение поведения во времени)."
         },
         {
             id: 17, topic: "Дискретно-событийное", type: "single",
             text: "Для чего используется системная динамика?",
             options: ["Для анализа сложных систем с нелинейными обратными связями", "Для моделирования времени события", "Для описания поведения отдельных агентов", "Для построения графических диаграмм причинных связей"],
-            correct: 0,
+            correct: "Для анализа сложных систем с нелинейными обратными связями",
             explanation: "Слайд 35. Используется для анализа сложных систем с нелинейными обратными связями, выявления причинно-следственных связей."
         },
-
-        // --- Тема 5: Инструменты ---
         {
             id: 18, topic: "Инструменты", type: "single",
             text: "Какое программное обеспечение поддерживает все три метода: агентное, дискретно-событийное и системную динамику?",
             options: ["AnyLogic", "GPSS", "Arena", "MATLAB Simulink"],
-            correct: 0,
+            correct: "AnyLogic",
             explanation: "Слайд 2, 52. AnyLogic поддерживает агентное, дискретно-событийное моделирование и системную динамику."
         },
         {
@@ -487,8 +750,6 @@
             ],
             explanation: "Слайды 52-53. GPSS — язык для СМО, Arena — Systems Modeling, Plant Simulation — Siemens, AnyLogic — российский разработчик «ЭксДжей Текнолоджис»."
         },
-
-        // --- Тема 6: Этапы разработки ---
         {
             id: 20, topic: "Этапы разработки", type: "sequence",
             text: "Расположите этапы разработки компьютерной модели сложной системы в правильном порядке:",
@@ -511,94 +772,90 @@
             id: 21, topic: "Этапы разработки", type: "single",
             text: "Что включает в себя этап «Определение границ» системы?",
             options: ["Логико-математическое описание системы и выделение её из окружающей среды", "Проведение вычислительного эксперимента", "Статистический анализ модели", "Перевод модели на язык программирования"],
-            correct: 0,
+            correct: "Логико-математическое описание системы и выделение её из окружающей среды",
             explanation: "Слайд 67. Включает логико-математическое описание, определение границ системы и внешней среды, определение входных и выходных параметров."
         },
         {
             id: 22, topic: "Этапы разработки", type: "single",
             text: "На каком этапе происходит оценка требуемой точности и адекватности имитационной модели?",
             options: ["Оценка адекватности (валидация)", "Трансляция модели", "Подготовка данных", "Интерпретация результатов"],
-            correct: 0,
+            correct: "Оценка адекватности (валидация)",
             explanation: "Слайд 85. Валидация — оценка требуемой точности и адекватности имитационной модели."
         },
         {
             id: 23, topic: "Этапы разработки", type: "single",
             text: "Что является результатом этапа «Формулировка проблемы»?",
             options: ["Документированное содержательное описание объекта моделирования", "План эксперимента", "Программный код модели", "Графические диаграммы"],
-            correct: 0,
+            correct: "Документированное содержательное описание объекта моделирования",
             explanation: "Слайд 62. Результат — документированное содержательное описание объекта моделирования (построение полной информационной модели)."
         },
-
-        // --- Тема 7: Уровни представления моделей и CASE ---
         {
             id: 24, topic: "Уровни моделей", type: "single",
             text: "Какие уровни представления модели выделяются при формализации концептуальной модели?",
             options: ["Неформализованный, формализованный, программный", "Аналитический, имитационный, статистический", "Концептуальный, физический, математический", "Стратегический, тактический, оперативный"],
-            correct: 0,
+            correct: "Неформализованный, формализованный, программный",
             explanation: "Слайд 77. Уровни: неформализованный (концептуальная модель), формализованный (формальная модель), программный (имитационная модель)."
         },
         {
             id: 25, topic: "Уровни моделей", type: "single",
             text: "Что представляет собой концептуальная модель?",
             options: ["Абстрактная модель, определяющая структуру системы, свойства элементов и причинно-следственные связи", "Программный код, реализующий имитацию", "Система уравнений, описывающая динамику", "Набор статистических данных"],
-            correct: 0,
+            correct: "Абстрактная модель, определяющая структуру системы, свойства элементов и причинно-следственные связи",
             explanation: "Слайд 72. КМ — абстрактная модель, определяющая структуру, свойства элементов и причинно-следственные связи."
         },
         {
             id: 26, topic: "Уровни моделей", type: "single",
             text: "Какое CASE-средство поддерживает нотацию UML и методологию Rational Objectory Process?",
             options: ["Rational Rose", "Design/IDEF", "ARIS Toolset", "Vantage Team Builder"],
-            correct: 0,
+            correct: "Rational Rose",
             explanation: "Слайд 95. Rational Rose поддерживает UML и собственную методологию Rational Objectory Process."
         },
-        
-        // --- Дополнительные вопросы для полного покрытия ---
         {
             id: 27, topic: "Основные понятия", type: "dropdown",
             text: "Заполните пропуски в определении: «[1] — это совокупность устойчивых отношений и связей между элементами: общая организация элементов, их пространственное расположение».",
-            blanks: [{ options: ["Структура", "Подсистема", "Класс", "Связь"], correct: 0 }],
+            blanks: [{ options: ["Структура", "Подсистема", "Класс", "Связь"], correct: "Структура" }],
             explanation: "Слайд 5. Структура — совокупность устойчивых отношений и связей между элементами."
         },
         {
             id: 28, topic: "Основные понятия", type: "dropdown",
             text: "«[1] — это мгновенное изменение некоторого элемента системы или состояния системы в целом, характеризующееся нулевой длительностью».",
-            blanks: [{ options: ["Событие", "Работа", "Процесс", "Транзакт"], correct: 0 }],
+            blanks: [{ options: ["Событие", "Работа", "Процесс", "Транзакт"], correct: "Событие" }],
             explanation: "Слайд 12. Событие — мгновенное изменение, характеризуется нулевой длительностью."
         },
         {
             id: 29, topic: "Классификация систем", type: "dropdown",
             text: "По количеству элементов системы делятся на: малые (10-10³), [1] (10⁴-10⁷), ультрасложные (10⁸-10³⁰) и суперсистемы (10³⁰-10²⁰⁰).",
-            blanks: [{ options: ["сложные", "большие", "простые", "глобальные"], correct: 0 }],
+            blanks: [{ options: ["сложные", "большие", "простые", "глобальные"], correct: "сложные" }],
             explanation: "Слайд 6. Сложные системы (10⁴-10⁷ элементов)."
         },
         {
             id: 30, topic: "Виды моделирования", type: "dropdown",
             text: "В зависимости от метода отображения динамики системы, выделяют: [1] (моделируется время события), агентное (поведение) и системную динамику (изменение поведения во времени).",
-            blanks: [{ options: ["дискретно-событийное", "статистическое", "когнитивное", "ситуационное"], correct: 0 }],
+            blanks: [{ options: ["дискретно-событийное", "статистическое", "когнитивное", "ситуационное"], correct: "дискретно-событийное" }],
             explanation: "Слайд 2. Дискретно-событийное моделирование моделирует время события."
         },
         {
             id: 31, topic: "Виды моделирования", type: "dropdown",
             text: "Системная динамика используется для анализа сложных систем с нелинейными [1] связями.",
-            blanks: [{ options: ["обратными", "прямыми", "стохастическими", "детерминированными"], correct: 0 }],
+            blanks: [{ options: ["обратными", "прямыми", "стохастическими", "детерминированными"], correct: "обратными" }],
             explanation: "Слайд 35. Системная динамика — для анализа систем с нелинейными обратными связями."
         },
         {
             id: 32, topic: "Этапы разработки", type: "dropdown",
             text: "На этапе «[1]» проводится перевод модели со специальных имитационных языков на язык программирования.",
-            blanks: [{ options: ["Трансляция модели", "Формулировка модели", "Оценка адекватности", "Подготовка данных"], correct: 0 }],
+            blanks: [{ options: ["Трансляция модели", "Формулировка модели", "Оценка адекватности", "Подготовка данных"], correct: "Трансляция модели" }],
             explanation: "Слайд 83. Трансляция модели — перевод на язык программирования."
         },
         {
             id: 33, topic: "Этапы разработки", type: "dropdown",
             text: "«[1]» — это оценка требуемой точности и адекватности имитационной модели.",
-            blanks: [{ options: ["Валидация", "Верификация", "Калибровка", "Оптимизация"], correct: 0 }],
+            blanks: [{ options: ["Валидация", "Верификация", "Калибровка", "Оптимизация"], correct: "Валидация" }],
             explanation: "Слайд 85. Валидация — оценка точности и адекватности."
         },
         {
             id: 34, topic: "Инструменты", type: "dropdown",
             text: "Язык объектно-ориентированного программирования для имитационного моделирования СМО, созданный Джефри Гордоном, называется [1].",
-            blanks: [{ options: ["GPSS", "AnyLogic", "Arena", "Plant Simulation"], correct: 0 }],
+            blanks: [{ options: ["GPSS", "AnyLogic", "Arena", "Plant Simulation"], correct: "GPSS" }],
             explanation: "Слайд 33, 52. GPSS (General Purpose Simulation System)."
         },
         {
@@ -639,10 +896,10 @@
             text: "Распределите методы по категориям: «Аналитическое моделирование» и «Имитационное моделирование»:",
             categories: ["Аналитическое моделирование", "Имитационное моделирование"],
             items: [
-                { text: "Модели в виде формул и уравнений", cat: 0 },
-                { text: "Разработка программы для компьютера", cat: 1 },
-                { text: "Диаграммы Фейнмана, графы состояний", cat: 0 },
-                { text: "Проведение экспериментов с моделью", cat: 1 }
+                { text: "Модели в виде формул и уравнений", cat: "Аналитическое моделирование" },
+                { text: "Разработка программы для компьютера", cat: "Имитационное моделирование" },
+                { text: "Диаграммы Фейнмана, графы состояний", cat: "Аналитическое моделирование" },
+                { text: "Проведение экспериментов с моделью", cat: "Имитационное моделирование" }
             ],
             explanation: "Слайды 21-23. Аналитическое использует формулы, диаграммы; имитационное — программы и эксперименты."
         },
@@ -651,9 +908,9 @@
             text: "Распределите системы по количеству элементов:",
             categories: ["Малые (10-10³)", "Сложные (10⁴-10⁷)", "Ультрасложные (10⁸-10³⁰)"],
             items: [
-                { text: "10² элементов", cat: 0 },
-                { text: "10⁶ элементов", cat: 1 },
-                { text: "10¹⁵ элементов", cat: 2 }
+                { text: "10² элементов", cat: "Малые (10-10³)" },
+                { text: "10⁶ элементов", cat: "Сложные (10⁴-10⁷)" },
+                { text: "10¹⁵ элементов", cat: "Ультрасложные (10⁸-10³⁰)" }
             ],
             explanation: "Слайд 6. Классификация по числу элементов."
         },
@@ -662,9 +919,9 @@
             text: "Распределите ПО по его основному назначению (по слайду 51):",
             categories: ["Системы компьютерной математики", "Системы имитационного моделирования", "Системы графического моделирования"],
             items: [
-                { text: "MATLAB, Simulink", cat: 0 },
-                { text: "AnyLogic, Arena, GPSS", cat: 1 },
-                { text: "AutoCAD, ArchiCAD, 3DStudioMax", cat: 2 }
+                { text: "MATLAB, Simulink", cat: "Системы компьютерной математики" },
+                { text: "AnyLogic, Arena, GPSS", cat: "Системы имитационного моделирования" },
+                { text: "AutoCAD, ArchiCAD, 3DStudioMax", cat: "Системы графического моделирования" }
             ],
             explanation: "Слайд 51. Классификация систем компьютерного моделирования по типу решаемых задач."
         },
@@ -672,56 +929,55 @@
             id: 41, topic: "Основные понятия", type: "single",
             text: "Какое утверждение о «Событии» НЕВЕРНО?",
             options: ["Событие имеет нулевую длительность", "Событие характеризуется условиями возникновения", "Событие управляет инициализацией процессов", "Событие всегда потребляет ресурсы системы"],
-            correct: 3,
+            correct: "Событие всегда потребляет ресурсы системы",
             explanation: "Слайд 12. Событие — мгновенное изменение, имеет нулевую длительность. Потребление ресурсов характерно для работ и процессов, а не для события."
         },
         {
             id: 42, topic: "Виды моделирования", type: "single",
             text: "Какое утверждение о системной динамике НЕВЕРНО?",
             options: ["Использует графические диаграммы причинных связей", "Создана Джефри Гордоном", "Применяется для анализа сложных систем с нелинейными обратными связями", "Моделирует изменение поведения во времени"],
-            correct: 1,
+            correct: "Создана Джефри Гордоном",
             explanation: "Слайд 35. Системная динамика создана Джейем Форрестером. Джефри Гордон создал GPSS."
         },
         {
             id: 43, topic: "Этапы разработки", type: "single",
             text: "Что НЕ относится к этапу «Формулировка проблемы»?",
             options: ["Постановка задачи", "Установление иерархии целей и подзадач", "Проведение вычислительного эксперимента", "Изучение поведения системы в целом"],
-            correct: 2,
+            correct: "Проведение вычислительного эксперимента",
             explanation: "Слайд 62. Вычислительный эксперимент относится к этапу «Экспериментирование» (слайд 89)."
         },
         {
             id: 44, topic: "Основные понятия", type: "single",
             text: "Какой термин определяется как «вариант элемента сложной системы, который может быть сложной системой в другой задаче»?",
             options: ["Подсистема", "Элемент", "Компонент", "Связь"],
-            correct: 0,
+            correct: "Подсистема",
             explanation: "Слайд 5. Подсистема — компонент системы, но масштаб меньше, чем у системы. Элемент сложной системы может быть сложной системой в другой задаче."
         },
         {
             id: 45, topic: "Виды моделирования", type: "single",
             text: "Какой подход используется при исследовании сложных индивидуальных управленческих систем (АСУ) и реализуется в средах схемотехнического моделирования?",
             options: ["Агрегативный подход", "Агентный подход", "Системная динамика", "Статистическое моделирование"],
-            correct: 0,
+            correct: "Агрегативный подход",
             explanation: "Слайд 31. Агрегативный подход используется при исследовании АСУ (MATLAB Simulink, LabVIEW и др.)."
         }
     ];
 
-    // --- ЛОГИКА ТРЕНАЖЁРА ---
+    // --- STATE ---
     let currentQuestions = [];
     let currentIndex = 0;
-    let sessionAnswers = {}; // { qId: { answered: true, isCorrect: bool } }
-    let sessionMode = 'all';
+    let sessionAnswers = {}; // qId -> { status, selected, isCorrect }
     let isExamMode = false;
+    let initialTopicList = [];
 
     // --- LOCALSTORAGE ---
     function getStats() {
-        let s = localStorage.getItem('im_stats');
+        let s = localStorage.getItem('im_stats_v2');
         if (!s) {
-            s = { attempts: 0, correct: 0, wrong: 0, history: {}, hard: [] };
-            localStorage.setItem('im_stats', JSON.stringify(s));
+            s = { attempts: 0, totalCorrect: 0, totalWrong: 0, history: {}, hard: [] };
+            localStorage.setItem('im_stats_v2', JSON.stringify(s));
         } else {
             s = JSON.parse(s);
         }
-        // Ensure defaults for history if empty
         if (!s.history) s.history = {};
         if (!s.hard) s.hard = [];
         return s;
@@ -729,20 +985,13 @@
 
     function saveStats(s) {
         try {
-            localStorage.setItem('im_stats', JSON.stringify(s));
+            localStorage.setItem('im_stats_v2', JSON.stringify(s));
         } catch(e) {
-            alert("Не удалось сохранить прогресс. Возможно, переполнено хранилище.");
+            console.warn("Не удалось сохранить прогресс.");
         }
     }
 
-    // --- UI UTILS ---
-    function showScreen(id) {
-        ['menu-screen', 'quiz-screen', 'results-screen'].forEach(s => {
-            document.getElementById(s).classList.add('hidden');
-        });
-        document.getElementById(id).classList.remove('hidden');
-    }
-
+    // --- UTILS ---
     function shuffle(arr) {
         let a = arr.slice();
         for (let i = a.length - 1; i > 0; i--) {
@@ -752,10 +1001,20 @@
         return a;
     }
 
-    // --- INIT MENU ---
+    function showScreen(id) {
+        ['menu-screen', 'quiz-screen', 'results-screen'].forEach(s => {
+            document.getElementById(s).classList.add('hidden');
+        });
+        document.getElementById(id).classList.remove('hidden');
+    }
+
+    // --- INIT ---
     function initMenu() {
+        showScreen('menu-screen');
+        
         // Topics
         const topics = [...new Set(QUESTIONS.map(q => q.topic))];
+        if (initialTopicList.length === 0) initialTopicList = topics;
         let topicHtml = '';
         topics.forEach(t => {
             topicHtml += `<label><input type="checkbox" value="${t}" class="topic-cb"> ${t}</label>`;
@@ -764,11 +1023,11 @@
         
         // Stats
         let stats = getStats();
-        let html = `<h3>Общая статистика</h3>
+        let html = `<h4>Общая статистика</h4>
                     <ul>
-                        <li>Прогонов: ${stats.attempts}</li>
-                        <li>Правильных ответов: ${stats.correct}</li>
-                        <li>Неправильных ответов: ${stats.wrong}</li>
+                        <li>Прогонов: <span>${stats.attempts}</span></li>
+                        <li>Всего верных: <span>${stats.totalCorrect}</span></li>
+                        <li>Всего ошибок: <span>${stats.totalWrong}</span></li>
                     </ul>`;
         document.getElementById('global-stats').innerHTML = html;
     }
@@ -785,54 +1044,40 @@
             pool = QUESTIONS;
             isExamMode = true;
         } else if (mode === 'errors') {
-            // Вопросы, которые были неправильно отвечены в прошлый раз (по истории)
             let errorIds = Object.keys(stats.history).filter(id => stats.history[id].lastCorrect === false);
-            if (errorIds.length === 0) {
-                alert("Нет ошибок для повторения!");
-                return;
-            }
+            if (errorIds.length === 0) return alert("Нет ошибок для повторения!");
             pool = QUESTIONS.filter(q => errorIds.includes(String(q.id)));
             isExamMode = false;
         } else if (mode === 'hard') {
-            if (stats.hard.length === 0) {
-                alert("Нет отмеченных сложных вопросов!");
-                return;
-            }
+            if (stats.hard.length === 0) return alert("Нет отмеченных сложных вопросов!");
             pool = QUESTIONS.filter(q => stats.hard.includes(q.id));
             isExamMode = false;
         } else if (mode === 'topics') {
             let selected = Array.from(document.querySelectorAll('.topic-cb:checked')).map(cb => cb.value);
-            if (selected.length === 0) {
-                alert("Выберите хотя бы одну тему!");
-                return;
-            }
+            if (selected.length === 0) return alert("Выберите хотя бы одну тему!");
             pool = QUESTIONS.filter(q => selected.includes(q.topic));
             isExamMode = false;
         }
 
-        // Shuffle questions
+        // Deep copy & Shuffle
         currentQuestions = shuffle(pool).map(q => {
-            let newQ = JSON.parse(JSON.stringify(q)); // Deep copy
-            // Shuffle options for single/multi
+            let newQ = JSON.parse(JSON.stringify(q));
+            
+            // Shuffle options
             if (newQ.type === 'single' || newQ.type === 'multi') {
-                let correctText = newQ.type === 'single' ? newQ.options[newQ.correct] : newQ.correct.map(i => newQ.options[i]);
-                let shuffledOptions = shuffle(newQ.options);
-                newQ.options = shuffledOptions;
-                if (newQ.type === 'single') {
-                    newQ.correct = shuffledOptions.indexOf(correctText);
-                } else {
-                    newQ.correct = correctText.map(text => shuffledOptions.indexOf(text));
-                }
+                let correctVals = newQ.type === 'single' ? [newQ.correct] : newQ.correct;
+                newQ.options = shuffle(newQ.options);
+                // We rely on string values now, so no index remapping needed!
             }
-            // Shuffle matching pairs
+            // Shuffle matching
             if (newQ.type === 'matching') {
                 newQ.pairs = shuffle(newQ.pairs);
             }
-            // Shuffle sequence items
+            // Shuffle sequence
             if (newQ.type === 'sequence') {
                 newQ.items = shuffle(newQ.items);
             }
-            // Shuffle category items
+            // Shuffle category
             if (newQ.type === 'category') {
                 newQ.items = shuffle(newQ.items);
             }
@@ -841,7 +1086,6 @@
 
         currentIndex = 0;
         sessionAnswers = {};
-        sessionMode = mode;
         stats.attempts++;
         saveStats(stats);
         
@@ -849,397 +1093,370 @@
         renderQuestion();
     }
 
-    function showMenu() {
-        showScreen('menu-screen');
-        initMenu();
-    }
-
-    // --- RENDER QUESTION ---
+    // --- RENDER ---
     function renderQuestion() {
-        if (currentIndex >= currentQuestions.length) {
-            finishQuiz();
-            return;
-        }
+        if (currentIndex >= currentQuestions.length) return finishQuiz();
 
         let q = currentQuestions[currentIndex];
         let stats = getStats();
-        
+        let ans = sessionAnswers[q.id] || { status: 'unanswered' };
+        let isAnswered = ans.status !== 'unanswered';
+        let isChecked = ans.status === 'correct' || ans.status === 'incorrect';
+
         // Header
         document.getElementById('q-counter').innerText = `Вопрос ${currentIndex + 1} из ${currentQuestions.length}`;
         document.getElementById('progress-fill').style.width = `${(currentIndex / currentQuestions.length) * 100}%`;
         document.getElementById('q-topic').innerText = q.topic;
         
-        // Hard button
+        // Hard Btn
         let btnHard = document.getElementById('btn-hard');
         if (stats.hard.includes(q.id)) {
-            btnHard.innerText = "Отмечено сложным ★";
-            btnHard.style.color = "#ffca28";
-            btnHard.style.fontWeight = "bold";
+            btnHard.classList.add('active');
+            btnHard.innerText = "★ Сложный";
         } else {
+            btnHard.classList.remove('active');
             btnHard.innerText = "Отметить сложным";
-            btnHard.style.color = "#666";
-            btnHard.style.fontWeight = "normal";
         }
 
-        // Text
-        document.getElementById('q-text').innerText = q.text;
+        // Question Text
+        let qText = document.getElementById('q-text');
+        if (q.type === 'dropdown') {
+            qText.innerHTML = ''; // Text handled in input area
+        } else {
+            qText.innerText = q.text;
+        }
 
         // Input Area
         let area = document.getElementById('q-input-area');
         area.innerHTML = '';
         
-        let answered = sessionAnswers[q.id] && sessionAnswers[q.id].answered;
-        let isExam = isExamMode;
-
+        // Render by type
         if (q.type === 'single') {
             let container = document.createElement('div');
             container.className = 'options-container';
-            q.options.forEach((opt, idx) => {
+            q.options.forEach(opt => {
                 let btn = document.createElement('button');
                 btn.className = 'option-btn';
                 btn.innerText = opt;
-                if (answered) {
+                
+                if (ans.selected && ans.selected.includes(opt)) btn.classList.add('selected');
+                
+                if (isChecked) {
                     btn.disabled = true;
                     btn.classList.add('disabled');
-                    if (sessionAnswers[q.id].selected.includes(idx)) {
-                        btn.classList.add(idx === q.correct ? 'correct' : 'incorrect');
-                        btn.innerHTML = `<span class="marker ${idx === q.correct ? 'correct' : 'incorrect'}">${idx === q.correct ? '✓' : '✗'}</span> ${opt}`;
-                    } else if (idx === q.correct && !isExam) {
+                    if (opt === q.correct) {
                         btn.classList.add('correct');
-                        btn.innerHTML = `<span class="marker correct">✓</span> ${opt}`;
+                        btn.innerHTML = `<span>${opt}</span><span class="marker-icon">✓</span>`;
+                    } else if (ans.selected && ans.selected.includes(opt)) {
+                        btn.classList.add('incorrect');
+                        btn.innerHTML = `<span>${opt}</span><span class="marker-icon">✕</span>`;
                     }
                 } else {
-                    btn.onclick = () => selectSingle(q.id, idx);
+                    btn.onclick = () => {
+                        sessionAnswers[q.id] = { status: 'answered', selected: [opt] };
+                        renderQuestion(); // Re-render to show selection
+                        checkCurrentAnswer(); // Auto check for single
+                    };
                 }
                 container.appendChild(btn);
             });
             area.appendChild(container);
+
         } else if (q.type === 'multi') {
             let container = document.createElement('div');
             container.className = 'options-container';
-            q.options.forEach((opt, idx) => {
+            q.options.forEach(opt => {
                 let btn = document.createElement('button');
                 btn.className = 'option-btn';
-                btn.innerText = opt;
-                btn.dataset.idx = idx;
-                if (answered) {
+                
+                let isSelected = ans.selected && ans.selected.includes(opt);
+                if (isSelected) btn.classList.add('selected');
+                
+                let innerHtml = `<div class="checkbox-mock"></div><span>${opt}</span>`;
+                
+                if (isChecked) {
                     btn.disabled = true;
                     btn.classList.add('disabled');
-                    let isSel = sessionAnswers[q.id].selected.includes(idx);
-                    let isCorr = q.correct.includes(idx);
-                    if (isSel) {
-                        btn.classList.add(isCorr ? 'correct' : 'incorrect');
-                        btn.innerHTML = `<span class="marker ${isCorr ? 'correct' : 'incorrect'}">${isCorr ? '✓' : '✗'}</span> ${opt}`;
-                    } else if (isCorr && !isExam) {
+                    let isCorrectOpt = q.correct.includes(opt);
+                    if (isCorrectOpt) {
                         btn.classList.add('correct');
-                        btn.innerHTML = `<span class="marker correct">✓</span> ${opt}`;
+                        innerHtml += `<span class="marker-icon" style="color:var(--success)">✓</span>`;
+                    } else if (isSelected && !isCorrectOpt) {
+                        btn.classList.add('incorrect');
+                        innerHtml += `<span class="marker-icon" style="color:var(--error)">✕</span>`;
                     }
                 } else {
-                    btn.onclick = () => toggleMulti(q.id, idx, btn);
+                    btn.onclick = () => {
+                        let currSelected = ans.selected || [];
+                        if (currSelected.includes(opt)) {
+                            currSelected = currSelected.filter(o => o !== opt);
+                        } else {
+                            currSelected.push(opt);
+                        }
+                        sessionAnswers[q.id] = { status: currSelected.length > 0 ? 'answered' : 'unanswered', selected: currSelected };
+                        renderQuestion();
+                    };
                 }
+                btn.innerHTML = innerHtml;
                 container.appendChild(btn);
             });
             area.appendChild(container);
-            if (!answered) {
-                let checkBtn = document.getElementById('btn-check');
-                checkBtn.classList.remove('hidden');
-                checkBtn.onclick = () => checkMulti(q);
-            }
+
         } else if (q.type === 'dropdown') {
             let div = document.createElement('div');
             div.innerHTML = q.text;
             area.appendChild(div);
-            // Text has [1], [2] markers
+            
             q.blanks.forEach((blank, i) => {
+                let block = document.createElement('div');
+                block.className = 'dropdown-block';
+                
                 let sel = document.createElement('select');
                 sel.id = `blank-${q.id}-${i}`;
                 let opts = shuffle(blank.options);
-                opts.forEach((o, oIdx) => {
+                opts.forEach(o => {
                     let option = document.createElement('option');
                     option.value = o;
                     option.innerText = o;
+                    if (ans.selected && ans.selected[i] === o) option.selected = true;
                     sel.appendChild(option);
                 });
-                if (answered) {
+                
+                if (isChecked) {
                     sel.disabled = true;
-                    sel.value = sessionAnswers[q.id].selected[i];
-                    let isCorr = sel.value === blank.options[blank.correct];
-                    sel.style.borderColor = isCorr ? 'var(--success)' : 'var(--error)';
-                    sel.style.background = isCorr ? 'var(--success-bg)' : 'var(--error-bg)';
-                    if (!isCorr && !isExam) {
-                        let feedback = document.createElement('span');
-                        feedback.style.marginLeft = '10px';
-                        feedback.style.color = 'var(--success)';
-                        feedback.innerText = `(Правильно: ${blank.options[blank.correct]})`;
-                        sel.parentNode.insertBefore(feedback, sel.nextSibling);
+                    let isCorr = ans.selected[i] === blank.correct;
+                    sel.className = isCorr ? 'correct-select' : 'incorrect-select';
+                    if (!isCorr) {
+                        let hint = document.createElement('span');
+                        hint.className = 'dropdown-hint';
+                        hint.innerText = `Правильно: ${blank.correct}`;
+                        block.appendChild(hint);
                     }
+                } else {
+                    sel.onchange = () => {
+                        let curr = sessionAnswers[q.id] ? sessionAnswers[q.id].selected : [];
+                        curr[i] = sel.value;
+                        sessionAnswers[q.id] = { status: 'answered', selected: curr };
+                    };
                 }
-                let container = document.createElement('div');
-                container.style.marginBottom = '10px';
-                container.appendChild(sel);
-                area.appendChild(container);
+                block.appendChild(sel);
+                area.appendChild(block);
             });
-            // Replace text markers
-            document.getElementById('q-text').innerHTML = ''; // Hide original text, show in area
-            if (!answered) {
-                let checkBtn = document.getElementById('btn-check');
-                checkBtn.classList.remove('hidden');
-                checkBtn.onclick = () => checkDropdown(q);
-            }
+
         } else if (q.type === 'matching') {
             let container = document.createElement('div');
             q.pairs.forEach((pair, idx) => {
                 let row = document.createElement('div');
                 row.className = 'match-row';
-                let termSpan = document.createElement('span');
-                termSpan.className = 'term';
-                termSpan.innerText = pair.left;
+                
+                if (isChecked) {
+                    if (ans.selected[idx] === pair.right) row.classList.add('is-correct');
+                    else row.classList.add('has-error');
+                }
+
+                let term = document.createElement('span');
+                term.className = 'term';
+                term.innerText = pair.left;
+                
                 let sel = document.createElement('select');
-                sel.id = `match-${q.id}-${idx}`;
                 let opts = shuffle(q.pairs.map(p => p.right));
-                opts.forEach((o, oIdx) => {
+                opts.forEach(o => {
                     let option = document.createElement('option');
                     option.value = o;
                     option.innerText = o;
+                    if (ans.selected && ans.selected[idx] === o) option.selected = true;
                     sel.appendChild(option);
                 });
-                if (answered) {
+
+                if (isChecked) {
                     sel.disabled = true;
-                    sel.value = sessionAnswers[q.id].selected[idx];
-                    let isCorr = sel.value === pair.right;
-                    sel.style.borderColor = isCorr ? 'var(--success)' : 'var(--error)';
-                    sel.style.background = isCorr ? 'var(--success-bg)' : 'var(--error-bg)';
-                    if (!isCorr && !isExam) {
-                        let feedback = document.createElement('span');
-                        feedback.style.marginLeft = '10px';
-                        feedback.style.color = 'var(--success)';
-                        feedback.style.fontSize = '12px';
-                        feedback.innerText = `(Правильно: ${pair.right})`;
-                        row.appendChild(feedback);
+                    if (ans.selected[idx] !== pair.right) {
+                        let hint = document.createElement('span');
+                        hint.style.fontSize = '12px';
+                        hint.style.color = 'var(--success)';
+                        hint.innerText = ` (${pair.right})`;
+                        sel.parentNode.insertBefore(hint, sel.nextSibling);
                     }
+                } else {
+                    sel.onchange = () => {
+                        let curr = sessionAnswers[q.id] ? sessionAnswers[q.id].selected : [];
+                        curr[idx] = sel.value;
+                        sessionAnswers[q.id] = { status: 'answered', selected: curr };
+                    };
                 }
-                row.appendChild(termSpan);
+                row.appendChild(term);
                 row.appendChild(sel);
                 container.appendChild(row);
             });
             area.appendChild(container);
-            if (!answered) {
-                let checkBtn = document.getElementById('btn-check');
-                checkBtn.classList.remove('hidden');
-                checkBtn.onclick = () => checkMatching(q);
-            }
+
         } else if (q.type === 'sequence') {
             let container = document.createElement('div');
             q.items.forEach((item, idx) => {
                 let row = document.createElement('div');
                 row.className = 'sequence-row';
+                
+                let isCorr = ans.selected && ans.selected[idx] === (q.items.indexOf(item) + 1);
+                if (isChecked) {
+                    row.classList.add(isCorr ? 'is-correct' : 'has-error');
+                }
+
                 let sel = document.createElement('select');
                 sel.className = 'num-select';
-                sel.id = `seq-${q.id}-${idx}`;
                 for (let i = 1; i <= q.items.length; i++) {
                     let option = document.createElement('option');
                     option.value = i;
                     option.innerText = i;
+                    if (ans.selected && ans.selected[idx] == i) option.selected = true;
                     sel.appendChild(option);
                 }
-                if (answered) {
+
+                let text = document.createElement('span');
+                text.className = 'text';
+                text.innerText = item;
+
+                if (isChecked) {
                     sel.disabled = true;
-                    sel.value = sessionAnswers[q.id].selected[idx];
-                    let isCorr = parseInt(sel.value) === (q.items.indexOf(item) + 1);
-                    sel.style.borderColor = isCorr ? 'var(--success)' : 'var(--error)';
-                    sel.style.background = isCorr ? 'var(--success-bg)' : 'var(--error-bg)';
+                    if (!isCorr) {
+                        let hint = document.createElement('span');
+                        hint.style.fontSize = '12px';
+                        hint.style.color = 'var(--success)';
+                        hint.innerText = ` (Позиция ${q.items.indexOf(item) + 1})`;
+                        text.appendChild(hint);
+                    }
+                } else {
+                    sel.onchange = () => {
+                        let curr = sessionAnswers[q.id] ? sessionAnswers[q.id].selected : [];
+                        curr[idx] = parseInt(sel.value);
+                        sessionAnswers[q.id] = { status: 'answered', selected: curr };
+                    };
                 }
-                let textSpan = document.createElement('span');
-                textSpan.className = 'text';
-                textSpan.innerText = item;
                 row.appendChild(sel);
-                row.appendChild(textSpan);
+                row.appendChild(text);
                 container.appendChild(row);
             });
             area.appendChild(container);
-            if (!answered) {
-                let checkBtn = document.getElementById('btn-check');
-                checkBtn.classList.remove('hidden');
-                checkBtn.onclick = () => checkSequence(q);
-            }
+
         } else if (q.type === 'category') {
             let container = document.createElement('div');
             q.items.forEach((item, idx) => {
                 let row = document.createElement('div');
                 row.className = 'match-row';
-                let textSpan = document.createElement('span');
-                textSpan.className = 'term';
-                textSpan.innerText = item.text;
+                
+                let isCorr = ans.selected && ans.selected[idx] === item.cat;
+                if (isChecked) {
+                    row.classList.add(isCorr ? 'is-correct' : 'has-error');
+                }
+
+                let text = document.createElement('span');
+                text.className = 'term';
+                text.innerText = item.text;
+                
                 let sel = document.createElement('select');
-                sel.id = `cat-${q.id}-${idx}`;
-                q.categories.forEach((cat, cIdx) => {
+                q.categories.forEach(cat => {
                     let option = document.createElement('option');
-                    option.value = cIdx;
+                    option.value = cat;
                     option.innerText = cat;
+                    if (ans.selected && ans.selected[idx] === cat) option.selected = true;
                     sel.appendChild(option);
                 });
-                if (answered) {
+
+                if (isChecked) {
                     sel.disabled = true;
-                    sel.value = sessionAnswers[q.id].selected[idx];
-                    let isCorr = parseInt(sel.value) === item.cat;
-                    sel.style.borderColor = isCorr ? 'var(--success)' : 'var(--error)';
-                    sel.style.background = isCorr ? 'var(--success-bg)' : 'var(--error-bg)';
+                    if (!isCorr) {
+                        let hint = document.createElement('span');
+                        hint.style.fontSize = '12px';
+                        hint.style.color = 'var(--success)';
+                        hint.innerText = ` (${item.cat})`;
+                        sel.parentNode.insertBefore(hint, sel.nextSibling);
+                    }
+                } else {
+                    sel.onchange = () => {
+                        let curr = sessionAnswers[q.id] ? sessionAnswers[q.id].selected : [];
+                        curr[idx] = sel.value;
+                        sessionAnswers[q.id] = { status: 'answered', selected: curr };
+                    };
                 }
-                row.appendChild(textSpan);
+                row.appendChild(text);
                 row.appendChild(sel);
                 container.appendChild(row);
             });
             area.appendChild(container);
-            if (!answered) {
-                let checkBtn = document.getElementById('btn-check');
-                checkBtn.classList.remove('hidden');
-                checkBtn.onclick = () => checkCategory(q);
-            }
         }
 
-        // Show Feedback if answered
-        let feedbackBox = document.getElementById('feedback-box');
-        feedbackBox.classList.add('hidden');
-        if (answered) {
-            let isCorrect = sessionAnswers[q.id].isCorrect;
-            let resText = isCorrect ? 'Верно' : 'Неверно';
-            if (isExam && !isCorrect) resText = 'Неверно'; // In exam mode, show correct answer only at the end, but feedback is just a marker
-            if (!isExam) {
-                feedbackBox.className = `feedback ${isCorrect ? 'correct' : 'incorrect'}`;
-                feedbackBox.innerHTML = `<strong>${resText}</strong><br>${q.explanation || ''}`;
-                feedbackBox.classList.remove('hidden');
-            } else {
-                // In exam mode, we don't show explanation, just a subtle mark
-                feedbackBox.className = 'feedback';
-                feedbackBox.innerHTML = '';
-                feedbackBox.classList.add('hidden');
-            }
+        // Feedback
+        let fb = document.getElementById('feedback-box');
+        fb.classList.add('hidden');
+        if (isChecked && !isExamMode) {
+            fb.className = `feedback-box ${ans.isCorrect ? 'correct' : 'incorrect'}`;
+            fb.innerHTML = `
+                <div class="feedback-title ${ans.isCorrect ? 'correct' : 'incorrect'}">
+                    ${ans.isCorrect ? '✓ Верно' : '✕ Неверно'}
+                </div>
+                <div class="feedback-text">${q.explanation || ''}</div>
+            `;
+            fb.classList.remove('hidden');
         }
 
         // Buttons
         document.getElementById('btn-prev').style.display = currentIndex > 0 ? 'block' : 'none';
-        document.getElementById('btn-skip').style.display = (!answered && !isExam) ? 'block' : 'none';
-        document.getElementById('btn-check').classList.add('hidden'); // Reset
-        document.getElementById('btn-next').classList.add('hidden');
+        document.getElementById('btn-skip').style.display = (!isChecked && !isExamMode) ? 'block' : 'none';
         
-        if (answered) {
-            document.getElementById('btn-check').classList.add('hidden');
-            document.getElementById('btn-next').classList.remove('hidden');
-            // If it's the last question, change text
-            if (currentIndex === currentQuestions.length - 1) {
-                document.getElementById('btn-next').innerText = 'Завершить';
-            } else {
-                document.getElementById('btn-next').innerText = 'Далее';
-            }
-            document.getElementById('btn-next').onclick = nextQuestion;
+        let btnCheck = document.getElementById('btn-check');
+        let btnNext = document.getElementById('btn-next');
+        
+        btnCheck.classList.add('hidden');
+        btnNext.classList.add('hidden');
+
+        if (isChecked) {
+            btnNext.classList.remove('hidden');
+            btnNext.innerText = (currentIndex === currentQuestions.length - 1) ? 'Завершить' : 'Далее';
         } else if (q.type === 'single') {
-            // single checks immediately, so next button will show after check
+            // Auto checked, so no check button needed
+        } else {
+            // Multi, dropdown, matching, sequence, category
+            btnCheck.classList.remove('hidden');
         }
     }
 
-    // --- ANSWER HANDLERS ---
-    function selectSingle(qId, idx) {
-        let q = currentQuestions.find(x => x.id === qId);
-        let isCorrect = idx === q.correct;
-        sessionAnswers[qId] = { answered: true, isCorrect: isCorrect, selected: [idx] };
+    // --- CHECKING LOGIC ---
+    function checkCurrentAnswer() {
+        let q = currentQuestions[currentIndex];
+        let ans = sessionAnswers[q.id];
+        if (!ans || ans.status === 'unanswered') return alert("Выберите ответ!");
         
-        // Update stats
-        updateGlobalStats(qId, isCorrect);
+        let isCorrect = false;
         
-        renderQuestion(); // Re-render to show result
-    }
+        if (q.type === 'single') {
+            isCorrect = ans.selected[0] === q.correct;
+        } else if (q.type === 'multi') {
+            // Must match exactly
+            let s = ans.selected.sort();
+            let c = q.correct.slice().sort();
+            isCorrect = s.length === c.length && s.every((val, index) => val === c[index]);
+        } else if (q.type === 'dropdown') {
+            // Check every blank
+            isCorrect = q.blanks.every((b, i) => ans.selected[i] === b.correct);
+        } else if (q.type === 'matching') {
+            isCorrect = q.pairs.every((p, i) => ans.selected[i] === p.right);
+        } else if (q.type === 'sequence') {
+            isCorrect = q.items.every((item, i) => ans.selected[i] === (q.items.indexOf(item) + 1));
+        } else if (q.type === 'category') {
+            isCorrect = q.items.every((item, i) => ans.selected[i] === item.cat);
+        }
 
-    function toggleMulti(qId, idx, btn) {
-        btn.classList.toggle('selected');
-    }
-
-    function checkMulti(q) {
-        let selected = [];
-        document.querySelectorAll('#q-input-area .option-btn').forEach((btn, i) => {
-            if (btn.classList.contains('selected')) selected.push(i);
-        });
-        if (selected.length === 0) return alert("Выберите хотя бы один вариант!");
+        ans.status = isCorrect ? 'correct' : 'incorrect';
+        ans.isCorrect = isCorrect;
         
-        let isCorrect = selected.length === q.correct.length && selected.every(i => q.correct.includes(i));
-        sessionAnswers[q.id] = { answered: true, isCorrect: isCorrect, selected: selected };
         updateGlobalStats(q.id, isCorrect);
         renderQuestion();
     }
 
-    function checkDropdown(q) {
-        let selected = [];
-        let allFilled = true;
-        q.blanks.forEach((b, i) => {
-            let sel = document.getElementById(`blank-${q.id}-${i}`);
-            selected.push(sel.value);
-        });
-        
-        let isCorrect = true;
-        q.blanks.forEach((b, i) => {
-            if (selected[i] !== b.options[b.correct]) isCorrect = false;
-        });
-        
-        sessionAnswers[q.id] = { answered: true, isCorrect: isCorrect, selected: selected };
-        updateGlobalStats(q.id, isCorrect);
-        renderQuestion();
-    }
-
-    function checkMatching(q) {
-        let selected = [];
-        q.pairs.forEach((p, i) => {
-            let sel = document.getElementById(`match-${q.id}-${i}`);
-            selected.push(sel.value);
-        });
-        
-        let isCorrect = true;
-        q.pairs.forEach((p, i) => {
-            if (selected[i] !== p.right) isCorrect = false;
-        });
-        
-        sessionAnswers[q.id] = { answered: true, isCorrect: isCorrect, selected: selected };
-        updateGlobalStats(q.id, isCorrect);
-        renderQuestion();
-    }
-
-    function checkSequence(q) {
-        let selected = [];
-        q.items.forEach((item, i) => {
-            let sel = document.getElementById(`seq-${q.id}-${i}`);
-            selected.push(parseInt(sel.value));
-        });
-        
-        let isCorrect = true;
-        q.items.forEach((item, i) => {
-            if (selected[i] !== (q.items.indexOf(item) + 1)) isCorrect = false;
-        });
-        
-        sessionAnswers[q.id] = { answered: true, isCorrect: isCorrect, selected: selected };
-        updateGlobalStats(q.id, isCorrect);
-        renderQuestion();
-    }
-
-    function checkCategory(q) {
-        let selected = [];
-        q.items.forEach((item, i) => {
-            let sel = document.getElementById(`cat-${q.id}-${i}`);
-            selected.push(parseInt(sel.value));
-        });
-        
-        let isCorrect = true;
-        q.items.forEach((item, i) => {
-            if (selected[i] !== item.cat) isCorrect = false;
-        });
-        
-        sessionAnswers[q.id] = { answered: true, isCorrect: isCorrect, selected: selected };
-        updateGlobalStats(q.id, isCorrect);
-        renderQuestion();
-    }
-
-    // --- STATS UPDATE ---
+    // --- STATS ---
     function updateGlobalStats(qId, isCorrect) {
         let stats = getStats();
-        if (isCorrect) stats.correct++;
-        else stats.wrong++;
+        if (isCorrect) stats.totalCorrect++;
+        else stats.totalWrong++;
         
         if (!stats.history[qId]) stats.history[qId] = { correct: 0, wrong: 0, lastCorrect: null };
         if (isCorrect) stats.history[qId].correct++;
@@ -1252,11 +1469,8 @@
     // --- NAVIGATION ---
     function nextQuestion() {
         currentIndex++;
-        if (currentIndex >= currentQuestions.length) {
-            finishQuiz();
-        } else {
-            renderQuestion();
-        }
+        if (currentIndex >= currentQuestions.length) finishQuiz();
+        else renderQuestion();
     }
 
     function prevQuestion() {
@@ -1267,93 +1481,109 @@
     }
 
     function skipQuestion() {
-        nextQuestion();
+        nextQuestion(); // Answer remains 'unanswered' in session
     }
 
     function toggleHard() {
         let q = currentQuestions[currentIndex];
         let stats = getStats();
         let idx = stats.hard.indexOf(q.id);
-        if (idx > -1) {
-            stats.hard.splice(idx, 1);
-        } else {
-            stats.hard.push(q.id);
-        }
+        if (idx > -1) stats.hard.splice(idx, 1);
+        else stats.hard.push(q.id);
         saveStats(stats);
         renderQuestion();
     }
 
     function finishEarly() {
-        if (confirm("Вы уверены, что хотите завершить?")) {
-            finishQuiz();
-        }
+        if (confirm("Вы уверены, что хотите завершить?")) finishQuiz();
     }
 
+    // --- FINISH ---
     function finishQuiz() {
         showScreen('results-screen');
         
         let total = currentQuestions.length;
         let correctCount = 0;
+        let incorrectCount = 0;
+        let skippedCount = 0;
+        let uncheckedCount = 0;
         let errorsHtml = '';
-        let topicStats = {};
-        
+
         currentQuestions.forEach(q => {
-            let ans = sessionAnswers[q.id];
-            if (ans && ans.isCorrect) {
+            let ans = sessionAnswers[q.id] || { status: 'unanswered' };
+            
+            if (ans.status === 'correct') {
                 correctCount++;
-                if (!topicStats[q.topic]) topicStats[q.topic] = { c: 0, t: 0 };
-                topicStats[q.topic].c++;
+            } else if (ans.status === 'incorrect') {
+                incorrectCount++;
+                errorsHtml += `<div class="error-item">
+                    <div class="error-q">${q.text}</div>
+                    <div class="error-ans">
+                        <span>Ваш ответ: Неверно</span>
+                        <span class="correct">Правильно: ${getCorrectAnswerText(q)}</span>
+                        <span style="font-size:12px; margin-top:4px;">${q.explanation || ''}</span>
+                    </div>
+                </div>`;
+            } else if (ans.status === 'answered') {
+                uncheckedCount++;
+                errorsHtml += `<div class="error-item">
+                    <div class="error-q">${q.text}</div>
+                    <div class="error-ans">
+                        <span style="color: var(--text-muted);">Не проверено</span>
+                        <span class="correct">Правильно: ${getCorrectAnswerText(q)}</span>
+                    </div>
+                </div>`;
             } else {
-                errorsHtml += `<li style="margin-bottom:10px;">
-                    <strong>Вопрос:</strong> ${q.text}<br>
-                    <span style="color: var(--error);">Ваш ответ: ${ans ? 'неверно' : 'пропущен'}</span><br>
-                    <span style="color: var(--success);">Правильный ответ: ${getCorrectAnswerText(q)}</span>
-                    <div style="font-size: 13px; color: #666; margin-top: 5px;">${q.explanation || ''}</div>
-                </li>`;
+                skippedCount++;
+                errorsHtml += `<div class="error-item">
+                    <div class="error-q">${q.text}</div>
+                    <div class="error-ans">
+                        <span>Пропущено</span>
+                        <span class="correct">Правильно: ${getCorrectAnswerText(q)}</span>
+                    </div>
+                </div>`;
             }
-            if (!topicStats[q.topic]) topicStats[q.topic] = { c: 0, t: 0 };
-            topicStats[q.topic].t++;
         });
 
-        let percent = Math.round((correctCount / total) * 100);
+        // Percentage only based on checked questions
+        let checkedTotal = correctCount + incorrectCount;
+        let percent = checkedTotal > 0 ? Math.round((correctCount / checkedTotal) * 100) : 0;
+
+        document.getElementById('res-percent').innerText = `${percent}%`;
+        document.getElementById('res-subtitle').innerText = `Результат (${correctCount} из ${checkedTotal} проверенных)`;
         
-        let statsHtml = `<h3>Результат: ${correctCount} из ${total} (${percent}%)</h3>`;
-        statsHtml += `<p>Темы:</p><ul>`;
-        for (let t in topicStats) {
-            statsHtml += `<li>${t}: ${topicStats[t].c} из ${topicStats[t].t}</li>`;
-        }
-        statsHtml += `</ul>`;
-        
-        document.getElementById('result-stats').innerHTML = statsHtml;
-        
+        document.getElementById('res-correct').innerText = correctCount;
+        document.getElementById('res-incorrect').innerText = incorrectCount;
+        document.getElementById('res-skipped').innerText = skippedCount;
+        document.getElementById('res-unchecked').innerText = uncheckedCount;
+
         if (errorsHtml) {
-            document.getElementById('result-errors').innerHTML = `<h4>Ошибки:</h4><ul>${errorsHtml}</ul>`;
+            document.getElementById('result-errors-container').classList.remove('hidden');
+            document.getElementById('result-errors').innerHTML = errorsHtml;
         } else {
-            document.getElementById('result-errors').innerHTML = `<p style="color: var(--success); font-weight: bold;">Все ответы верны!</p>`;
+            document.getElementById('result-errors-container').classList.add('hidden');
         }
     }
 
     function getCorrectAnswerText(q) {
-        if (q.type === 'single') return q.options[q.correct];
-        if (q.type === 'multi') return q.correct.map(i => q.options[i]).join(', ');
-        if (q.type === 'dropdown') return q.blanks.map(b => b.options[b.correct]).join(', ');
+        if (q.type === 'single') return q.correct;
+        if (q.type === 'multi') return q.correct.join(', ');
+        if (q.type === 'dropdown') return q.blanks.map(b => b.correct).join(', ');
         if (q.type === 'matching') return q.pairs.map(p => `${p.left} → ${p.right}`).join('; ');
         if (q.type === 'sequence') return q.items.map((item, i) => `${i+1}. ${item}`).join('; ');
-        if (q.type === 'category') return q.items.map((item, i) => `${item.text} → ${q.categories[item.cat]}`).join('; ');
+        if (q.type === 'category') return q.items.map(item => `${item.text} → ${item.cat}`).join('; ');
         return '';
     }
 
     function resetProgress() {
-        if (confirm("Вы уверены, что хотите сбросить весь прогресс? Это действие необратимо.")) {
-            localStorage.removeItem('im_stats');
+        if (confirm("Сбросить весь прогресс? Это действие необратимо.")) {
+            localStorage.removeItem('im_stats_v2');
             initMenu();
-            alert("Прогресс сброшен.");
         }
     }
 
-    // --- INIT ON LOAD ---
+    // --- START ---
     window.onload = initMenu;
-
 </script>
 </body>
 </html>
