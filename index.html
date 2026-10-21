@@ -1184,7 +1184,6 @@
                     btn.classList.add('disabled');
                     let isCorrectOpt = q.correct.includes(opt);
                     
-                    // Логика отображения для множественного выбора
                     if (isCorrectOpt) {
                         btn.classList.add('correct');
                         innerHtml += `<span class="marker-icon" style="color:var(--success)">✓</span>`;
@@ -1211,7 +1210,6 @@
 
         } else if (q.type === 'dropdown') {
             let div = document.createElement('div');
-            // Replace [1], [2] with placeholders for visual
             div.innerHTML = q.text.replace(/\[\d\]/g, '<span style="color:var(--primary); font-weight:bold;">[...]</span>');
             area.appendChild(div);
             
@@ -1221,8 +1219,9 @@
                 
                 let sel = document.createElement('select');
                 sel.id = `blank-${q.id}-${i}`;
+                sel.dataset.qid = q.id;
+                sel.dataset.idx = i;
                 
-                // Добавляем пустой дефолтный вариант
                 let defaultOpt = document.createElement('option');
                 defaultOpt.value = "";
                 defaultOpt.innerText = "— Выберите вариант ответа —";
@@ -1250,9 +1249,9 @@
                         block.appendChild(hint);
                     }
                 } else {
-                    sel.onchange = () => {
+                    sel.onchange = (e) => {
                         let curr = sessionAnswers[q.id] ? sessionAnswers[q.id].selected : [];
-                        curr[i] = sel.value;
+                        curr[i] = e.target.value;
                         sessionAnswers[q.id] = { status: 'answered', selected: curr };
                     };
                 }
@@ -1276,8 +1275,9 @@
                 term.innerText = pair.left;
                 
                 let sel = document.createElement('select');
+                sel.dataset.qid = q.id;
+                sel.dataset.idx = idx;
                 
-                // Default empty option
                 let defaultOpt = document.createElement('option');
                 defaultOpt.value = "";
                 defaultOpt.innerText = "— Выбрать —";
@@ -1302,12 +1302,12 @@
                         hint.style.color = 'var(--success)';
                         hint.style.fontWeight = '600';
                         hint.innerText = ` (${pair.right})`;
-                        sel.parentNode.insertBefore(hint, sel.nextSibling);
+                        row.appendChild(hint);
                     }
                 } else {
-                    sel.onchange = () => {
+                    sel.onchange = (e) => {
                         let curr = sessionAnswers[q.id] ? sessionAnswers[q.id].selected : [];
-                        curr[idx] = sel.value;
+                        curr[idx] = e.target.value;
                         sessionAnswers[q.id] = { status: 'answered', selected: curr };
                     };
                 }
@@ -1330,6 +1330,8 @@
 
                 let sel = document.createElement('select');
                 sel.className = 'num-select';
+                sel.dataset.qid = q.id;
+                sel.dataset.idx = idx;
                 
                 let defaultOpt = document.createElement('option');
                 defaultOpt.value = "";
@@ -1358,12 +1360,12 @@
                         hint.style.color = 'var(--success)';
                         hint.style.fontWeight = '600';
                         hint.innerText = ` (Позиция ${q.items.indexOf(item) + 1})`;
-                        text.appendChild(hint);
+                        row.appendChild(hint);
                     }
                 } else {
-                    sel.onchange = () => {
+                    sel.onchange = (e) => {
                         let curr = sessionAnswers[q.id] ? sessionAnswers[q.id].selected : [];
-                        curr[idx] = parseInt(sel.value);
+                        curr[idx] = parseInt(e.target.value);
                         sessionAnswers[q.id] = { status: 'answered', selected: curr };
                     };
                 }
@@ -1389,6 +1391,8 @@
                 text.innerText = item.text;
                 
                 let sel = document.createElement('select');
+                sel.dataset.qid = q.id;
+                sel.dataset.idx = idx;
                 
                 let defaultOpt = document.createElement('option');
                 defaultOpt.value = "";
@@ -1413,12 +1417,12 @@
                         hint.style.color = 'var(--success)';
                         hint.style.fontWeight = '600';
                         hint.innerText = ` (${item.cat})`;
-                        sel.parentNode.insertBefore(hint, sel.nextSibling);
+                        row.appendChild(hint);
                     }
                 } else {
-                    sel.onchange = () => {
+                    sel.onchange = (e) => {
                         let curr = sessionAnswers[q.id] ? sessionAnswers[q.id].selected : [];
-                        curr[idx] = sel.value;
+                        curr[idx] = e.target.value;
                         sessionAnswers[q.id] = { status: 'answered', selected: curr };
                     };
                 }
@@ -1467,20 +1471,36 @@
     function checkCurrentAnswer() {
         let q = currentQuestions[currentIndex];
         let ans = sessionAnswers[q.id];
-        if (!ans || ans.status === 'unanswered') return alert("Выберите ответ!");
         
-        // Check if all blanks are filled
-        if (q.type === 'dropdown' && ans.selected.length !== q.blanks.length) return alert("Заполните все пропуски!");
-        if (q.type === 'matching' && ans.selected.length !== q.pairs.length) return alert("Сопоставьте все элементы!");
-        if (q.type === 'sequence' && ans.selected.length !== q.items.length) return alert("Укажите позиции для всех элементов!");
-        if (q.type === 'category' && ans.selected.length !== q.items.length) return alert("Распределите все элементы по категориям!");
+        // If it's a dropdown/matching/sequence/category, we must pull data from DOM to be safe
+        if (['dropdown', 'matching', 'sequence', 'category'].includes(q.type)) {
+            let selects = document.querySelectorAll(`#q-input-area select`);
+            let selected = [];
+            let allFilled = true;
+            
+            selects.forEach(sel => {
+                let val = sel.value;
+                if (!val) allFilled = false;
+                selected[parseInt(sel.dataset.idx)] = q.type === 'sequence' ? parseInt(val) : val;
+            });
+
+            if (!allFilled) {
+                return alert("Пожалуйста, заполните все поля (выберите варианты из списков).");
+            }
+            
+            if (!ans) ans = {};
+            ans.selected = selected;
+            ans.status = 'answered';
+            sessionAnswers[q.id] = ans;
+        }
+
+        if (!ans || ans.status === 'unanswered') return alert("Выберите ответ!");
 
         let isCorrect = false;
         
         if (q.type === 'single') {
             isCorrect = ans.selected[0] === q.correct;
         } else if (q.type === 'multi') {
-            // Строгое совпадение: выбраны все правильные и нет лишних
             let s = ans.selected.sort();
             let c = q.correct.slice().sort();
             isCorrect = s.length === c.length && s.every((val, index) => val === c[index]);
