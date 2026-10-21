@@ -1,0 +1,1359 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тренажёр: Имитационное моделирование</title>
+    <style>
+        :root {
+            --primary: #4a90e2;
+            --bg: #f4f7f6;
+            --card-bg: #ffffff;
+            --text: #333333;
+            --text-light: #666666;
+            --success: #2ecc71;
+            --success-bg: #d5f5e3;
+            --error: #e74c3c;
+            --error-bg: #fadbd8;
+            --border: #ddd;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.5;
+            padding: 20px 10px;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        #app {
+            width: 100%;
+            max-width: 800px;
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .hidden { display: none !important; }
+
+        /* Header & Progress */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+            color: var(--text-light);
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 10px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #eee;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--primary);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        /* Question Area */
+        .question-text {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .option-btn {
+            background: #fff;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            padding: 12px 15px;
+            text-align: left;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .option-btn:hover {
+            border-color: var(--primary);
+        }
+
+        .option-btn.selected {
+            border-color: var(--primary);
+            background: #e3f2fd;
+        }
+
+        .option-btn.correct {
+            border-color: var(--success);
+            background: var(--success-bg);
+        }
+
+        .option-btn.incorrect {
+            border-color: var(--error);
+            background: var(--error-bg);
+        }
+        
+        .option-btn.disabled {
+            cursor: not-allowed;
+        }
+
+        .marker {
+            font-weight: bold;
+            width: 20px;
+        }
+
+        .marker.correct { color: var(--success); }
+        .marker.incorrect { color: var(--error); }
+
+        /* Select & Matching */
+        select {
+            width: 100%;
+            padding: 10px;
+            border-radius: 6px;
+            border: 2px solid var(--border);
+            font-size: 16px;
+            margin-bottom: 10px;
+            background: #fff;
+        }
+
+        .match-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .match-row select {
+            margin-bottom: 0;
+            flex: 1;
+        }
+
+        .match-row .term {
+            flex: 1;
+            font-weight: 600;
+        }
+
+        .sequence-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .sequence-row .text {
+            flex: 1;
+        }
+        
+        .sequence-row .num-select {
+            width: 60px;
+            flex-shrink: 0;
+        }
+
+        /* Feedback & Actions */
+        .feedback {
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-size: 15px;
+        }
+
+        .feedback.correct { background: var(--success-bg); border-left: 4px solid var(--success); }
+        .feedback.incorrect { background: var(--error-bg); border-left: 4px solid var(--error); }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+            border-top: 1px solid var(--border);
+            padding-top: 20px;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.2s;
+            color: #fff;
+            background: var(--primary);
+            flex: 1;
+            min-width: 120px;
+        }
+
+        button:hover { opacity: 0.9; }
+        button:disabled { background: #ccc; cursor: not-allowed; }
+        
+        .btn-secondary { background: #95a5a6; }
+        .btn-danger { background: var(--error); }
+
+        /* Menu Screen */
+        .menu-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        @media (max-width: 600px) {
+            .menu-grid { grid-template-columns: 1fr; }
+        }
+
+        .stats-box {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            font-size: 14px;
+        }
+        
+        .stats-box ul {
+            margin-top: 10px;
+            padding-left: 20px;
+        }
+        
+        .stats-box li { margin-bottom: 5px; }
+
+        .topic-list label {
+            display: block;
+            margin-bottom: 10px;
+            cursor: pointer;
+        }
+        .topic-list input[type="checkbox"] {
+            margin-right: 8px;
+        }
+
+        .tag {
+            font-size: 12px;
+            background: #eee;
+            padding: 4px 8px;
+            border-radius: 12px;
+            margin-left: 10px;
+            vertical-align: middle;
+        }
+
+        .tag-hard { background: #ffca28; color: #333; }
+    </style>
+</head>
+<body>
+
+<div id="app">
+    <!-- MENU SCREEN -->
+    <div id="menu-screen">
+        <h2 style="text-align: center; margin-bottom: 10px;">Имитационное моделирование</h2>
+        <p style="text-align: center; color: var(--text-light); margin-bottom: 20px; font-size: 14px;">Интерактивный тренажёр для запоминания</p>
+        
+        <div class="menu-grid">
+            <button onclick="startMode('all')">Все вопросы</button>
+            <button onclick="startMode('errors')">Работа над ошибками</button>
+            <button onclick="startMode('hard')">Сложные вопросы</button>
+            <button onclick="startMode('exam')">Экзамен</button>
+        </div>
+
+        <div style="margin-top: 15px;">
+            <details>
+                <summary style="cursor: pointer; font-weight: 600; padding: 10px; background: #eee; border-radius: 8px;">Выбрать темы для повторения</summary>
+                <div class="topic-list" id="topic-list" style="margin-top: 10px; padding: 10px; background: #f9f9f9; border-radius: 8px;">
+                    <!-- Заполняется через JS -->
+                </div>
+                <button onclick="startMode('topics')" style="margin-top: 10px;">Начать по выбранным темам</button>
+            </details>
+        </div>
+
+        <div class="stats-box" id="global-stats" style="margin-top: 20px;">
+            <!-- Заполняется через JS -->
+        </div>
+
+        <button onclick="resetProgress()" class="btn-danger" style="margin-top: 20px; width: 100%;">Сбросить весь прогресс</button>
+    </div>
+
+    <!-- QUIZ SCREEN -->
+    <div id="quiz-screen" class="hidden">
+        <div class="header">
+            <span id="q-counter">Вопрос 1 из 10</span>
+            <button id="btn-finish" class="btn-secondary" style="padding: 5px 10px; font-size: 12px; flex: none; min-width: auto;" onclick="finishEarly()">Завершить</button>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+        
+        <div style="display: flex; justify-content: space-between; margin-top: 10px;">
+            <span class="tag" id="q-topic">Тема</span>
+            <button id="btn-hard" onclick="toggleHard()" style="padding: 2px 8px; font-size: 12px; flex: none; background: transparent; color: var(--text-light); border: 1px solid var(--border);">Отметить сложным</button>
+        </div>
+
+        <div class="question-text" id="q-text">Текст вопроса</div>
+        <div id="q-input-area"></div>
+        
+        <div class="feedback hidden" id="feedback-box"></div>
+
+        <div class="actions">
+            <button id="btn-prev" onclick="prevQuestion()" class="btn-secondary">Назад</button>
+            <button id="btn-skip" onclick="skipQuestion()" class="btn-secondary">Пропустить</button>
+            <button id="btn-check" onclick="checkAnswer()" class="hidden">Проверить</button>
+            <button id="btn-next" onclick="nextQuestion()" class="hidden">Далее</button>
+        </div>
+    </div>
+
+    <!-- RESULTS SCREEN -->
+    <div id="results-screen" class="hidden">
+        <h2 style="text-align: center; margin-bottom: 20px;">Результаты</h2>
+        <div class="stats-box" id="result-stats"></div>
+        <div id="result-errors" style="margin-top: 20px;"></div>
+        
+        <div class="actions" style="margin-top: 20px;">
+            <button onclick="startMode('errors')">Повторить ошибки</button>
+            <button onclick="startMode('all')">Пройти заново</button>
+            <button onclick="showMenu()" class="btn-secondary">В меню</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // --- БАЗА ВОПРОСОВ ---
+    const QUESTIONS = [
+        // --- Тема 1: Основные понятия ---
+        {
+            id: 1, topic: "Основные понятия", type: "single",
+            text: "Что определяется как «сущность в виртуальном пространстве, обладающая определенным состоянием и поведением, имеющая заданные значения свойств (атрибутов) и операций над ними»?",
+            options: ["Объект", "Класс", "Система", "Агент"],
+            correct: 0,
+            explanation: "Слайд 3. Именно такое определение даётся понятию «Объект» в объектно-ориентированном подходе."
+        },
+        {
+            id: 2, topic: "Основные понятия", type: "single",
+            text: "Как называется простейшая неделимая часть системы, свойства которой определяются конкретной задачей?",
+            options: ["Компонент", "Элемент", "Подсистема", "Структура"],
+            correct: 1,
+            explanation: "Слайд 5. Элемент — простейшая неделимая часть. Компонент — объединение элементов (масштаб меньше системы)."
+        },
+        {
+            id: 3, topic: "Основные понятия", type: "single",
+            text: "Что из перечисленного НЕ относится к свойствам, которыми должен обладать объект, считающийся системой?",
+            options: ["Целостность", "Делимость", "Стохастичность", "Эмерджентность"],
+            correct: 2,
+            explanation: "Слайд 4. Свойства системы: целостность, делимость, наличие устойчивых связей, организация и эмерджентность. Стохастичность не является обязательным свойством."
+        },
+        {
+            id: 4, topic: "Основные понятия", type: "multi",
+            text: "Выберите все характеристики, которые относятся к понятию «Процесс» (слайд 10):",
+            options: ["Логически связанный набор работ", "Мгновенное изменение состояния", "Характеризуется длительностью и потребляемыми ресурсами", "Имеет нулевую длительность"],
+            correct: [0, 2],
+            explanation: "Слайд 10. Процесс — логически связанный набор работ, характеризуется длительностью, результатом, ресурсами, условиями запуска/остановки. Мгновенное изменение — это событие (слайд 12)."
+        },
+        {
+            id: 5, topic: "Основные понятия", type: "single",
+            text: "Что представляет собой «Транзакт» в имитационном моделировании?",
+            options: ["Сообщение (заявка на обслуживание), поступающее извне", "Мгновенное изменение состояния системы", "Единичное действие по обработке данных", "Совокупность устойчивых связей"],
+            correct: 0,
+            explanation: "Слайд 13. Транзакт — это сообщение (заявка на обслуживание), проходящее по системе и активирующее процессы."
+        },
+        
+        // --- Тема 2: Классификация систем ---
+        {
+            id: 6, topic: "Классификация систем", type: "single",
+            text: "Согласно классификации по числу элементов, к какому классу относятся системы с количеством элементов 10⁴–10⁷?",
+            options: ["Малые", "Сложные", "Ультрасложные", "Суперсистемы"],
+            correct: 1,
+            explanation: "Слайд 6. Малые (10-10³), Сложные (10⁴-10⁷), Ультрасложные (10⁸-10³⁰), Суперсистемы (10³⁰-10²⁰⁰)."
+        },
+        {
+            id: 7, topic: "Классификация систем", type: "multi",
+            text: "Какие особенности характерны для больших систем? (Выберите все верные)",
+            options: ["Большое количество элементов", "Иерархичность структуры управления", "Наличие человека в контуре управления", "Отсутствие взаимосвязей между элементами"],
+            correct: [0, 1, 2],
+            explanation: "Слайд 7. Особенности больших систем: большое количество элементов, взаимосвязь и взаимодействие, иерархичность, наличие человека и принятие решений в условиях неопределенности."
+        },
+        
+        // --- Тема 3: Виды моделирования ---
+        {
+            id: 8, topic: "Виды моделирования", type: "single",
+            text: "Какой вид моделирования представляет собой «процесс описания информации об объекте с помощью формализованных, неформализованных языков, образно-иллюстративных материалов»?",
+            options: ["Физическое", "Концептуальное (информационное)", "Математическое", "Компьютерное"],
+            correct: 1,
+            explanation: "Слайд 19. Концептуальное (информационное) моделирование — это описание информации об объекте."
+        },
+        {
+            id: 9, topic: "Виды моделирования", type: "single",
+            text: "В чем отличие имитационного моделирования от аналитического?",
+            options: ["Аналитическое использует формулы и уравнения, а имитационное — программу для компьютера", "Аналитическое всегда точнее имитационного", "Имитационное не позволяет прогнозировать поведение системы", "Аналитическое применимо только для сложных систем"],
+            correct: 0,
+            explanation: "Слайд 21-23. Аналитическое — формулы, уравнения. Имитационное — разработка модели в виде программы и проведение экспериментов с ней."
+        },
+        {
+            id: 10, topic: "Виды моделирования", type: "single",
+            text: "Какой метод моделирования основан на многократном воспроизведении процесса для вычисления статистических характеристик случайных процессов?",
+            options: ["Метод Монте-Карло", "Метод системной динамики", "Агентное моделирование", "Дискретно-событийное моделирование"],
+            correct: 0,
+            explanation: "Слайд 25. Статистическое (численное) моделирование изначально базируется на методе Монте-Карло (метод статистических испытаний)."
+        },
+        {
+            id: 11, topic: "Виды моделирования", type: "multi",
+            text: "Какие из перечисленных методов относятся к разновидностям имитационного моделирования? (Выберите все)",
+            options: ["Системная динамика", "Агентное моделирование", "Когнитивное моделирование", "Линейное программирование"],
+            correct: [0, 1, 2],
+            explanation: "Слайд 24. Разновидности ИМ: статистическое, динамических систем, системная динамика, дискретно-событийное, агентное, когнитивное, ситуационное, экспертное."
+        },
+        {
+            id: 12, topic: "Виды моделирования", type: "single",
+            text: "Кто является автором парадигмы системной динамики, использующей графические диаграммы причинных связей?",
+            options: ["Джефри Гордон", "Джей Форрестер", "Р. Аксельрод", "Джон фон Нейман"],
+            correct: 1,
+            explanation: "Слайд 35 (фото) и контекст. Системная динамика (System Dynamics) была создана Джейем Форрестером (Jay Forrester). Джефри Гордон создал GPSS."
+        },
+        {
+            id: 13, topic: "Виды моделирования", type: "single",
+            text: "В чем суть агентного моделирования?",
+            options: ["В исследовании работы децентрализованных агентов и того, как их поведение определяет поведение всей системы", "В построении графических диаграмм причинных связей", "В описании функционирования системы из одного состояния в другое", "В использовании формул и уравнений для нахождения решения"],
+            correct: 0,
+            explanation: "Слайд 38. Агентное моделирование исследует децентрализованных агентов и их влияние на систему."
+        },
+        {
+            id: 14, topic: "Виды моделирования", type: "single",
+            text: "Какой вид моделирования основан на идеях теории искусственного интеллекта и используется для управления сложными техническими и организационными системами?",
+            options: ["Ситуационное моделирование", "Когнитивное моделирование", "Дискретно-событийное моделирование", "Статистическое моделирование"],
+            correct: 0,
+            explanation: "Слайд 45. Ситуационное моделирование — метод управления сложными системами, основанный на идеях ИИ."
+        },
+        
+        // --- Тема 4: Дискретно-событийное и системная динамика ---
+        {
+            id: 15, topic: "Дискретно-событийное", type: "single",
+            text: "Кто спроектировал и реализовал на IBM систему дискретно-событийного программирования GPSS в 1960 году?",
+            options: ["Джефри Гордон", "Джей Форрестер", "Р. Аксельрод", "Джон фон Нейман"],
+            correct: 0,
+            explanation: "Слайд 33. Джефри Гордон, 1960 г., GPSS (Global Purpose Simulation System)."
+        },
+        {
+            id: 16, topic: "Дискретно-событийное", type: "single",
+            text: "Что моделируется в дискретно-событийном подходе?",
+            options: ["Время события", "Непрерывное изменение поведения во времени", "Поведение отдельных агентов", "Пространственное перемещение объектов"],
+            correct: 0,
+            explanation: "Слайд 2. AnyLogic: дискретно-событийное (моделируется время события), агентное (поведение), системная динамика (изменение поведения во времени)."
+        },
+        {
+            id: 17, topic: "Дискретно-событийное", type: "single",
+            text: "Для чего используется системная динамика?",
+            options: ["Для анализа сложных систем с нелинейными обратными связями", "Для моделирования времени события", "Для описания поведения отдельных агентов", "Для построения графических диаграмм причинных связей"],
+            correct: 0,
+            explanation: "Слайд 35. Используется для анализа сложных систем с нелинейными обратными связями, выявления причинно-следственных связей."
+        },
+
+        // --- Тема 5: Инструменты ---
+        {
+            id: 18, topic: "Инструменты", type: "single",
+            text: "Какое программное обеспечение поддерживает все три метода: агентное, дискретно-событийное и системную динамику?",
+            options: ["AnyLogic", "GPSS", "Arena", "MATLAB Simulink"],
+            correct: 0,
+            explanation: "Слайд 2, 52. AnyLogic поддерживает агентное, дискретно-событийное моделирование и системную динамику."
+        },
+        {
+            id: 19, topic: "Инструменты", type: "matching",
+            text: "Сопоставьте программное обеспечение и его разработчика/особенность:",
+            pairs: [
+                { left: "GPSS", right: "Язык объектно-ориентированного программирования для ИМ СМО" },
+                { left: "Arena", right: "Разработчик: Systems Modeling Corporation" },
+                { left: "Plant Simulation", right: "Разработчик: Siemens PLM Software" },
+                { left: "AnyLogic", right: "Разработчик: «ЭксДжей Текнолоджис»" }
+            ],
+            explanation: "Слайды 52-53. GPSS — язык для СМО, Arena — Systems Modeling, Plant Simulation — Siemens, AnyLogic — российский разработчик «ЭксДжей Текнолоджис»."
+        },
+
+        // --- Тема 6: Этапы разработки ---
+        {
+            id: 20, topic: "Этапы разработки", type: "sequence",
+            text: "Расположите этапы разработки компьютерной модели сложной системы в правильном порядке:",
+            items: [
+                "Формулировка проблемы",
+                "Определение границ",
+                "Формулировка модели",
+                "Подготовка данных",
+                "Трансляция модели",
+                "Оценка адекватности",
+                "Стратегическое планирование",
+                "Тактическое планирование",
+                "Экспериментирование",
+                "Интерпретация результатов",
+                "Реализация"
+            ],
+            explanation: "Слайд 60. Правильная последовательность этапов: 1-Формулировка проблемы, 2-Определение границ, 3-Формулировка модели, 4-Подготовка данных, 5-Трансляция, 6-Оценка адекватности, 7-Стратегическое планирование, 8-Тактическое планирование, 9-Экспериментирование, 10-Интерпретация, 11-Реализация."
+        },
+        {
+            id: 21, topic: "Этапы разработки", type: "single",
+            text: "Что включает в себя этап «Определение границ» системы?",
+            options: ["Логико-математическое описание системы и выделение её из окружающей среды", "Проведение вычислительного эксперимента", "Статистический анализ модели", "Перевод модели на язык программирования"],
+            correct: 0,
+            explanation: "Слайд 67. Включает логико-математическое описание, определение границ системы и внешней среды, определение входных и выходных параметров."
+        },
+        {
+            id: 22, topic: "Этапы разработки", type: "single",
+            text: "На каком этапе происходит оценка требуемой точности и адекватности имитационной модели?",
+            options: ["Оценка адекватности (валидация)", "Трансляция модели", "Подготовка данных", "Интерпретация результатов"],
+            correct: 0,
+            explanation: "Слайд 85. Валидация — оценка требуемой точности и адекватности имитационной модели."
+        },
+        {
+            id: 23, topic: "Этапы разработки", type: "single",
+            text: "Что является результатом этапа «Формулировка проблемы»?",
+            options: ["Документированное содержательное описание объекта моделирования", "План эксперимента", "Программный код модели", "Графические диаграммы"],
+            correct: 0,
+            explanation: "Слайд 62. Результат — документированное содержательное описание объекта моделирования (построение полной информационной модели)."
+        },
+
+        // --- Тема 7: Уровни представления моделей и CASE ---
+        {
+            id: 24, topic: "Уровни моделей", type: "single",
+            text: "Какие уровни представления модели выделяются при формализации концептуальной модели?",
+            options: ["Неформализованный, формализованный, программный", "Аналитический, имитационный, статистический", "Концептуальный, физический, математический", "Стратегический, тактический, оперативный"],
+            correct: 0,
+            explanation: "Слайд 77. Уровни: неформализованный (концептуальная модель), формализованный (формальная модель), программный (имитационная модель)."
+        },
+        {
+            id: 25, topic: "Уровни моделей", type: "single",
+            text: "Что представляет собой концептуальная модель?",
+            options: ["Абстрактная модель, определяющая структуру системы, свойства элементов и причинно-следственные связи", "Программный код, реализующий имитацию", "Система уравнений, описывающая динамику", "Набор статистических данных"],
+            correct: 0,
+            explanation: "Слайд 72. КМ — абстрактная модель, определяющая структуру, свойства элементов и причинно-следственные связи."
+        },
+        {
+            id: 26, topic: "Уровни моделей", type: "single",
+            text: "Какое CASE-средство поддерживает нотацию UML и методологию Rational Objectory Process?",
+            options: ["Rational Rose", "Design/IDEF", "ARIS Toolset", "Vantage Team Builder"],
+            correct: 0,
+            explanation: "Слайд 95. Rational Rose поддерживает UML и собственную методологию Rational Objectory Process."
+        },
+        
+        // --- Дополнительные вопросы для полного покрытия ---
+        {
+            id: 27, topic: "Основные понятия", type: "dropdown",
+            text: "Заполните пропуски в определении: «[1] — это совокупность устойчивых отношений и связей между элементами: общая организация элементов, их пространственное расположение».",
+            blanks: [{ options: ["Структура", "Подсистема", "Класс", "Связь"], correct: 0 }],
+            explanation: "Слайд 5. Структура — совокупность устойчивых отношений и связей между элементами."
+        },
+        {
+            id: 28, topic: "Основные понятия", type: "dropdown",
+            text: "«[1] — это мгновенное изменение некоторого элемента системы или состояния системы в целом, характеризующееся нулевой длительностью».",
+            blanks: [{ options: ["Событие", "Работа", "Процесс", "Транзакт"], correct: 0 }],
+            explanation: "Слайд 12. Событие — мгновенное изменение, характеризуется нулевой длительностью."
+        },
+        {
+            id: 29, topic: "Классификация систем", type: "dropdown",
+            text: "По количеству элементов системы делятся на: малые (10-10³), [1] (10⁴-10⁷), ультрасложные (10⁸-10³⁰) и суперсистемы (10³⁰-10²⁰⁰).",
+            blanks: [{ options: ["сложные", "большие", "простые", "глобальные"], correct: 0 }],
+            explanation: "Слайд 6. Сложные системы (10⁴-10⁷ элементов)."
+        },
+        {
+            id: 30, topic: "Виды моделирования", type: "dropdown",
+            text: "В зависимости от метода отображения динамики системы, выделяют: [1] (моделируется время события), агентное (поведение) и системную динамику (изменение поведения во времени).",
+            blanks: [{ options: ["дискретно-событийное", "статистическое", "когнитивное", "ситуационное"], correct: 0 }],
+            explanation: "Слайд 2. Дискретно-событийное моделирование моделирует время события."
+        },
+        {
+            id: 31, topic: "Виды моделирования", type: "dropdown",
+            text: "Системная динамика используется для анализа сложных систем с нелинейными [1] связями.",
+            blanks: [{ options: ["обратными", "прямыми", "стохастическими", "детерминированными"], correct: 0 }],
+            explanation: "Слайд 35. Системная динамика — для анализа систем с нелинейными обратными связями."
+        },
+        {
+            id: 32, topic: "Этапы разработки", type: "dropdown",
+            text: "На этапе «[1]» проводится перевод модели со специальных имитационных языков на язык программирования.",
+            blanks: [{ options: ["Трансляция модели", "Формулировка модели", "Оценка адекватности", "Подготовка данных"], correct: 0 }],
+            explanation: "Слайд 83. Трансляция модели — перевод на язык программирования."
+        },
+        {
+            id: 33, topic: "Этапы разработки", type: "dropdown",
+            text: "«[1]» — это оценка требуемой точности и адекватности имитационной модели.",
+            blanks: [{ options: ["Валидация", "Верификация", "Калибровка", "Оптимизация"], correct: 0 }],
+            explanation: "Слайд 85. Валидация — оценка точности и адекватности."
+        },
+        {
+            id: 34, topic: "Инструменты", type: "dropdown",
+            text: "Язык объектно-ориентированного программирования для имитационного моделирования СМО, созданный Джефри Гордоном, называется [1].",
+            blanks: [{ options: ["GPSS", "AnyLogic", "Arena", "Plant Simulation"], correct: 0 }],
+            explanation: "Слайд 33, 52. GPSS (General Purpose Simulation System)."
+        },
+        {
+            id: 35, topic: "Основные понятия", type: "matching",
+            text: "Сопоставьте понятия и их определения:",
+            pairs: [
+                { left: "Элемент", right: "Простейшая неделимая часть системы" },
+                { left: "Компонент", right: "Объединение элементов (масштаб меньше системы)" },
+                { left: "Структура", right: "Совокупность устойчивых отношений и связей между элементами" },
+                { left: "Система", right: "Целое, созданное из частей, обладающее новыми свойствами" }
+            ],
+            explanation: "Слайды 4-5. Определения элемента, компонента, структуры и системы."
+        },
+        {
+            id: 36, topic: "Виды моделирования", type: "matching",
+            text: "Сопоставьте вид моделирования и его суть:",
+            pairs: [
+                { left: "Концептуальное", right: "Описание информации об объекте на формализованном/неформализованном языке" },
+                { left: "Физическое", right: "Разработка натурных, аналоговых, масштабных моделей" },
+                { left: "Математическое", right: "Использование формул, уравнений, неравенств" },
+                { left: "Компьютерное", right: "Модель, воспроизводящая объект программными средствами" }
+            ],
+            explanation: "Слайд 19. Определения концептуального, физического, математического и компьютерного моделирования."
+        },
+        {
+            id: 37, topic: "Этапы разработки", type: "matching",
+            text: "Сопоставьте этап и его результат/действие:",
+            pairs: [
+                { left: "Формулировка проблемы", right: "Документированное содержательное описание объекта" },
+                { left: "Определение границ", right: "Логико-математическое описание системы, выделение из среды" },
+                { left: "Трансляция модели", right: "Перевод на язык программирования, отладка" },
+                { left: "Оценка адекватности", right: "Испытание, корректировка, комплексное тестирование" }
+            ],
+            explanation: "Слайды 62, 67, 83, 85. Соответствие этапов и их результатов."
+        },
+        {
+            id: 38, topic: "Виды моделирования", type: "category",
+            text: "Распределите методы по категориям: «Аналитическое моделирование» и «Имитационное моделирование»:",
+            categories: ["Аналитическое моделирование", "Имитационное моделирование"],
+            items: [
+                { text: "Модели в виде формул и уравнений", cat: 0 },
+                { text: "Разработка программы для компьютера", cat: 1 },
+                { text: "Диаграммы Фейнмана, графы состояний", cat: 0 },
+                { text: "Проведение экспериментов с моделью", cat: 1 }
+            ],
+            explanation: "Слайды 21-23. Аналитическое использует формулы, диаграммы; имитационное — программы и эксперименты."
+        },
+        {
+            id: 39, topic: "Классификация систем", type: "category",
+            text: "Распределите системы по количеству элементов:",
+            categories: ["Малые (10-10³)", "Сложные (10⁴-10⁷)", "Ультрасложные (10⁸-10³⁰)"],
+            items: [
+                { text: "10² элементов", cat: 0 },
+                { text: "10⁶ элементов", cat: 1 },
+                { text: "10¹⁵ элементов", cat: 2 }
+            ],
+            explanation: "Слайд 6. Классификация по числу элементов."
+        },
+        {
+            id: 40, topic: "Инструменты", type: "category",
+            text: "Распределите ПО по его основному назначению (по слайду 51):",
+            categories: ["Системы компьютерной математики", "Системы имитационного моделирования", "Системы графического моделирования"],
+            items: [
+                { text: "MATLAB, Simulink", cat: 0 },
+                { text: "AnyLogic, Arena, GPSS", cat: 1 },
+                { text: "AutoCAD, ArchiCAD, 3DStudioMax", cat: 2 }
+            ],
+            explanation: "Слайд 51. Классификация систем компьютерного моделирования по типу решаемых задач."
+        },
+        {
+            id: 41, topic: "Основные понятия", type: "single",
+            text: "Какое утверждение о «Событии» НЕВЕРНО?",
+            options: ["Событие имеет нулевую длительность", "Событие характеризуется условиями возникновения", "Событие управляет инициализацией процессов", "Событие всегда потребляет ресурсы системы"],
+            correct: 3,
+            explanation: "Слайд 12. Событие — мгновенное изменение, имеет нулевую длительность. Потребление ресурсов характерно для работ и процессов, а не для события."
+        },
+        {
+            id: 42, topic: "Виды моделирования", type: "single",
+            text: "Какое утверждение о системной динамике НЕВЕРНО?",
+            options: ["Использует графические диаграммы причинных связей", "Создана Джефри Гордоном", "Применяется для анализа сложных систем с нелинейными обратными связями", "Моделирует изменение поведения во времени"],
+            correct: 1,
+            explanation: "Слайд 35. Системная динамика создана Джейем Форрестером. Джефри Гордон создал GPSS."
+        },
+        {
+            id: 43, topic: "Этапы разработки", type: "single",
+            text: "Что НЕ относится к этапу «Формулировка проблемы»?",
+            options: ["Постановка задачи", "Установление иерархии целей и подзадач", "Проведение вычислительного эксперимента", "Изучение поведения системы в целом"],
+            correct: 2,
+            explanation: "Слайд 62. Вычислительный эксперимент относится к этапу «Экспериментирование» (слайд 89)."
+        },
+        {
+            id: 44, topic: "Основные понятия", type: "single",
+            text: "Какой термин определяется как «вариант элемента сложной системы, который может быть сложной системой в другой задаче»?",
+            options: ["Подсистема", "Элемент", "Компонент", "Связь"],
+            correct: 0,
+            explanation: "Слайд 5. Подсистема — компонент системы, но масштаб меньше, чем у системы. Элемент сложной системы может быть сложной системой в другой задаче."
+        },
+        {
+            id: 45, topic: "Виды моделирования", type: "single",
+            text: "Какой подход используется при исследовании сложных индивидуальных управленческих систем (АСУ) и реализуется в средах схемотехнического моделирования?",
+            options: ["Агрегативный подход", "Агентный подход", "Системная динамика", "Статистическое моделирование"],
+            correct: 0,
+            explanation: "Слайд 31. Агрегативный подход используется при исследовании АСУ (MATLAB Simulink, LabVIEW и др.)."
+        }
+    ];
+
+    // --- ЛОГИКА ТРЕНАЖЁРА ---
+    let currentQuestions = [];
+    let currentIndex = 0;
+    let sessionAnswers = {}; // { qId: { answered: true, isCorrect: bool } }
+    let sessionMode = 'all';
+    let isExamMode = false;
+
+    // --- LOCALSTORAGE ---
+    function getStats() {
+        let s = localStorage.getItem('im_stats');
+        if (!s) {
+            s = { attempts: 0, correct: 0, wrong: 0, history: {}, hard: [] };
+            localStorage.setItem('im_stats', JSON.stringify(s));
+        } else {
+            s = JSON.parse(s);
+        }
+        // Ensure defaults for history if empty
+        if (!s.history) s.history = {};
+        if (!s.hard) s.hard = [];
+        return s;
+    }
+
+    function saveStats(s) {
+        try {
+            localStorage.setItem('im_stats', JSON.stringify(s));
+        } catch(e) {
+            alert("Не удалось сохранить прогресс. Возможно, переполнено хранилище.");
+        }
+    }
+
+    // --- UI UTILS ---
+    function showScreen(id) {
+        ['menu-screen', 'quiz-screen', 'results-screen'].forEach(s => {
+            document.getElementById(s).classList.add('hidden');
+        });
+        document.getElementById(id).classList.remove('hidden');
+    }
+
+    function shuffle(arr) {
+        let a = arr.slice();
+        for (let i = a.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [a[i], a[j]] = [a[j], a[i]];
+        }
+        return a;
+    }
+
+    // --- INIT MENU ---
+    function initMenu() {
+        // Topics
+        const topics = [...new Set(QUESTIONS.map(q => q.topic))];
+        let topicHtml = '';
+        topics.forEach(t => {
+            topicHtml += `<label><input type="checkbox" value="${t}" class="topic-cb"> ${t}</label>`;
+        });
+        document.getElementById('topic-list').innerHTML = topicHtml;
+        
+        // Stats
+        let stats = getStats();
+        let html = `<h3>Общая статистика</h3>
+                    <ul>
+                        <li>Прогонов: ${stats.attempts}</li>
+                        <li>Правильных ответов: ${stats.correct}</li>
+                        <li>Неправильных ответов: ${stats.wrong}</li>
+                    </ul>`;
+        document.getElementById('global-stats').innerHTML = html;
+    }
+
+    // --- START MODE ---
+    function startMode(mode) {
+        let stats = getStats();
+        let pool = [];
+
+        if (mode === 'all') {
+            pool = QUESTIONS;
+            isExamMode = false;
+        } else if (mode === 'exam') {
+            pool = QUESTIONS;
+            isExamMode = true;
+        } else if (mode === 'errors') {
+            // Вопросы, которые были неправильно отвечены в прошлый раз (по истории)
+            let errorIds = Object.keys(stats.history).filter(id => stats.history[id].lastCorrect === false);
+            if (errorIds.length === 0) {
+                alert("Нет ошибок для повторения!");
+                return;
+            }
+            pool = QUESTIONS.filter(q => errorIds.includes(String(q.id)));
+            isExamMode = false;
+        } else if (mode === 'hard') {
+            if (stats.hard.length === 0) {
+                alert("Нет отмеченных сложных вопросов!");
+                return;
+            }
+            pool = QUESTIONS.filter(q => stats.hard.includes(q.id));
+            isExamMode = false;
+        } else if (mode === 'topics') {
+            let selected = Array.from(document.querySelectorAll('.topic-cb:checked')).map(cb => cb.value);
+            if (selected.length === 0) {
+                alert("Выберите хотя бы одну тему!");
+                return;
+            }
+            pool = QUESTIONS.filter(q => selected.includes(q.topic));
+            isExamMode = false;
+        }
+
+        // Shuffle questions
+        currentQuestions = shuffle(pool).map(q => {
+            let newQ = JSON.parse(JSON.stringify(q)); // Deep copy
+            // Shuffle options for single/multi
+            if (newQ.type === 'single' || newQ.type === 'multi') {
+                let correctText = newQ.type === 'single' ? newQ.options[newQ.correct] : newQ.correct.map(i => newQ.options[i]);
+                let shuffledOptions = shuffle(newQ.options);
+                newQ.options = shuffledOptions;
+                if (newQ.type === 'single') {
+                    newQ.correct = shuffledOptions.indexOf(correctText);
+                } else {
+                    newQ.correct = correctText.map(text => shuffledOptions.indexOf(text));
+                }
+            }
+            // Shuffle matching pairs
+            if (newQ.type === 'matching') {
+                newQ.pairs = shuffle(newQ.pairs);
+            }
+            // Shuffle sequence items
+            if (newQ.type === 'sequence') {
+                newQ.items = shuffle(newQ.items);
+            }
+            // Shuffle category items
+            if (newQ.type === 'category') {
+                newQ.items = shuffle(newQ.items);
+            }
+            return newQ;
+        });
+
+        currentIndex = 0;
+        sessionAnswers = {};
+        sessionMode = mode;
+        stats.attempts++;
+        saveStats(stats);
+        
+        showScreen('quiz-screen');
+        renderQuestion();
+    }
+
+    function showMenu() {
+        showScreen('menu-screen');
+        initMenu();
+    }
+
+    // --- RENDER QUESTION ---
+    function renderQuestion() {
+        if (currentIndex >= currentQuestions.length) {
+            finishQuiz();
+            return;
+        }
+
+        let q = currentQuestions[currentIndex];
+        let stats = getStats();
+        
+        // Header
+        document.getElementById('q-counter').innerText = `Вопрос ${currentIndex + 1} из ${currentQuestions.length}`;
+        document.getElementById('progress-fill').style.width = `${(currentIndex / currentQuestions.length) * 100}%`;
+        document.getElementById('q-topic').innerText = q.topic;
+        
+        // Hard button
+        let btnHard = document.getElementById('btn-hard');
+        if (stats.hard.includes(q.id)) {
+            btnHard.innerText = "Отмечено сложным ★";
+            btnHard.style.color = "#ffca28";
+            btnHard.style.fontWeight = "bold";
+        } else {
+            btnHard.innerText = "Отметить сложным";
+            btnHard.style.color = "#666";
+            btnHard.style.fontWeight = "normal";
+        }
+
+        // Text
+        document.getElementById('q-text').innerText = q.text;
+
+        // Input Area
+        let area = document.getElementById('q-input-area');
+        area.innerHTML = '';
+        
+        let answered = sessionAnswers[q.id] && sessionAnswers[q.id].answered;
+        let isExam = isExamMode;
+
+        if (q.type === 'single') {
+            let container = document.createElement('div');
+            container.className = 'options-container';
+            q.options.forEach((opt, idx) => {
+                let btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.innerText = opt;
+                if (answered) {
+                    btn.disabled = true;
+                    btn.classList.add('disabled');
+                    if (sessionAnswers[q.id].selected.includes(idx)) {
+                        btn.classList.add(idx === q.correct ? 'correct' : 'incorrect');
+                        btn.innerHTML = `<span class="marker ${idx === q.correct ? 'correct' : 'incorrect'}">${idx === q.correct ? '✓' : '✗'}</span> ${opt}`;
+                    } else if (idx === q.correct && !isExam) {
+                        btn.classList.add('correct');
+                        btn.innerHTML = `<span class="marker correct">✓</span> ${opt}`;
+                    }
+                } else {
+                    btn.onclick = () => selectSingle(q.id, idx);
+                }
+                container.appendChild(btn);
+            });
+            area.appendChild(container);
+        } else if (q.type === 'multi') {
+            let container = document.createElement('div');
+            container.className = 'options-container';
+            q.options.forEach((opt, idx) => {
+                let btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.innerText = opt;
+                btn.dataset.idx = idx;
+                if (answered) {
+                    btn.disabled = true;
+                    btn.classList.add('disabled');
+                    let isSel = sessionAnswers[q.id].selected.includes(idx);
+                    let isCorr = q.correct.includes(idx);
+                    if (isSel) {
+                        btn.classList.add(isCorr ? 'correct' : 'incorrect');
+                        btn.innerHTML = `<span class="marker ${isCorr ? 'correct' : 'incorrect'}">${isCorr ? '✓' : '✗'}</span> ${opt}`;
+                    } else if (isCorr && !isExam) {
+                        btn.classList.add('correct');
+                        btn.innerHTML = `<span class="marker correct">✓</span> ${opt}`;
+                    }
+                } else {
+                    btn.onclick = () => toggleMulti(q.id, idx, btn);
+                }
+                container.appendChild(btn);
+            });
+            area.appendChild(container);
+            if (!answered) {
+                let checkBtn = document.getElementById('btn-check');
+                checkBtn.classList.remove('hidden');
+                checkBtn.onclick = () => checkMulti(q);
+            }
+        } else if (q.type === 'dropdown') {
+            let div = document.createElement('div');
+            div.innerHTML = q.text;
+            area.appendChild(div);
+            // Text has [1], [2] markers
+            q.blanks.forEach((blank, i) => {
+                let sel = document.createElement('select');
+                sel.id = `blank-${q.id}-${i}`;
+                let opts = shuffle(blank.options);
+                opts.forEach((o, oIdx) => {
+                    let option = document.createElement('option');
+                    option.value = o;
+                    option.innerText = o;
+                    sel.appendChild(option);
+                });
+                if (answered) {
+                    sel.disabled = true;
+                    sel.value = sessionAnswers[q.id].selected[i];
+                    let isCorr = sel.value === blank.options[blank.correct];
+                    sel.style.borderColor = isCorr ? 'var(--success)' : 'var(--error)';
+                    sel.style.background = isCorr ? 'var(--success-bg)' : 'var(--error-bg)';
+                    if (!isCorr && !isExam) {
+                        let feedback = document.createElement('span');
+                        feedback.style.marginLeft = '10px';
+                        feedback.style.color = 'var(--success)';
+                        feedback.innerText = `(Правильно: ${blank.options[blank.correct]})`;
+                        sel.parentNode.insertBefore(feedback, sel.nextSibling);
+                    }
+                }
+                let container = document.createElement('div');
+                container.style.marginBottom = '10px';
+                container.appendChild(sel);
+                area.appendChild(container);
+            });
+            // Replace text markers
+            document.getElementById('q-text').innerHTML = ''; // Hide original text, show in area
+            if (!answered) {
+                let checkBtn = document.getElementById('btn-check');
+                checkBtn.classList.remove('hidden');
+                checkBtn.onclick = () => checkDropdown(q);
+            }
+        } else if (q.type === 'matching') {
+            let container = document.createElement('div');
+            q.pairs.forEach((pair, idx) => {
+                let row = document.createElement('div');
+                row.className = 'match-row';
+                let termSpan = document.createElement('span');
+                termSpan.className = 'term';
+                termSpan.innerText = pair.left;
+                let sel = document.createElement('select');
+                sel.id = `match-${q.id}-${idx}`;
+                let opts = shuffle(q.pairs.map(p => p.right));
+                opts.forEach((o, oIdx) => {
+                    let option = document.createElement('option');
+                    option.value = o;
+                    option.innerText = o;
+                    sel.appendChild(option);
+                });
+                if (answered) {
+                    sel.disabled = true;
+                    sel.value = sessionAnswers[q.id].selected[idx];
+                    let isCorr = sel.value === pair.right;
+                    sel.style.borderColor = isCorr ? 'var(--success)' : 'var(--error)';
+                    sel.style.background = isCorr ? 'var(--success-bg)' : 'var(--error-bg)';
+                    if (!isCorr && !isExam) {
+                        let feedback = document.createElement('span');
+                        feedback.style.marginLeft = '10px';
+                        feedback.style.color = 'var(--success)';
+                        feedback.style.fontSize = '12px';
+                        feedback.innerText = `(Правильно: ${pair.right})`;
+                        row.appendChild(feedback);
+                    }
+                }
+                row.appendChild(termSpan);
+                row.appendChild(sel);
+                container.appendChild(row);
+            });
+            area.appendChild(container);
+            if (!answered) {
+                let checkBtn = document.getElementById('btn-check');
+                checkBtn.classList.remove('hidden');
+                checkBtn.onclick = () => checkMatching(q);
+            }
+        } else if (q.type === 'sequence') {
+            let container = document.createElement('div');
+            q.items.forEach((item, idx) => {
+                let row = document.createElement('div');
+                row.className = 'sequence-row';
+                let sel = document.createElement('select');
+                sel.className = 'num-select';
+                sel.id = `seq-${q.id}-${idx}`;
+                for (let i = 1; i <= q.items.length; i++) {
+                    let option = document.createElement('option');
+                    option.value = i;
+                    option.innerText = i;
+                    sel.appendChild(option);
+                }
+                if (answered) {
+                    sel.disabled = true;
+                    sel.value = sessionAnswers[q.id].selected[idx];
+                    let isCorr = parseInt(sel.value) === (q.items.indexOf(item) + 1);
+                    sel.style.borderColor = isCorr ? 'var(--success)' : 'var(--error)';
+                    sel.style.background = isCorr ? 'var(--success-bg)' : 'var(--error-bg)';
+                }
+                let textSpan = document.createElement('span');
+                textSpan.className = 'text';
+                textSpan.innerText = item;
+                row.appendChild(sel);
+                row.appendChild(textSpan);
+                container.appendChild(row);
+            });
+            area.appendChild(container);
+            if (!answered) {
+                let checkBtn = document.getElementById('btn-check');
+                checkBtn.classList.remove('hidden');
+                checkBtn.onclick = () => checkSequence(q);
+            }
+        } else if (q.type === 'category') {
+            let container = document.createElement('div');
+            q.items.forEach((item, idx) => {
+                let row = document.createElement('div');
+                row.className = 'match-row';
+                let textSpan = document.createElement('span');
+                textSpan.className = 'term';
+                textSpan.innerText = item.text;
+                let sel = document.createElement('select');
+                sel.id = `cat-${q.id}-${idx}`;
+                q.categories.forEach((cat, cIdx) => {
+                    let option = document.createElement('option');
+                    option.value = cIdx;
+                    option.innerText = cat;
+                    sel.appendChild(option);
+                });
+                if (answered) {
+                    sel.disabled = true;
+                    sel.value = sessionAnswers[q.id].selected[idx];
+                    let isCorr = parseInt(sel.value) === item.cat;
+                    sel.style.borderColor = isCorr ? 'var(--success)' : 'var(--error)';
+                    sel.style.background = isCorr ? 'var(--success-bg)' : 'var(--error-bg)';
+                }
+                row.appendChild(textSpan);
+                row.appendChild(sel);
+                container.appendChild(row);
+            });
+            area.appendChild(container);
+            if (!answered) {
+                let checkBtn = document.getElementById('btn-check');
+                checkBtn.classList.remove('hidden');
+                checkBtn.onclick = () => checkCategory(q);
+            }
+        }
+
+        // Show Feedback if answered
+        let feedbackBox = document.getElementById('feedback-box');
+        feedbackBox.classList.add('hidden');
+        if (answered) {
+            let isCorrect = sessionAnswers[q.id].isCorrect;
+            let resText = isCorrect ? 'Верно' : 'Неверно';
+            if (isExam && !isCorrect) resText = 'Неверно'; // In exam mode, show correct answer only at the end, but feedback is just a marker
+            if (!isExam) {
+                feedbackBox.className = `feedback ${isCorrect ? 'correct' : 'incorrect'}`;
+                feedbackBox.innerHTML = `<strong>${resText}</strong><br>${q.explanation || ''}`;
+                feedbackBox.classList.remove('hidden');
+            } else {
+                // In exam mode, we don't show explanation, just a subtle mark
+                feedbackBox.className = 'feedback';
+                feedbackBox.innerHTML = '';
+                feedbackBox.classList.add('hidden');
+            }
+        }
+
+        // Buttons
+        document.getElementById('btn-prev').style.display = currentIndex > 0 ? 'block' : 'none';
+        document.getElementById('btn-skip').style.display = (!answered && !isExam) ? 'block' : 'none';
+        document.getElementById('btn-check').classList.add('hidden'); // Reset
+        document.getElementById('btn-next').classList.add('hidden');
+        
+        if (answered) {
+            document.getElementById('btn-check').classList.add('hidden');
+            document.getElementById('btn-next').classList.remove('hidden');
+            // If it's the last question, change text
+            if (currentIndex === currentQuestions.length - 1) {
+                document.getElementById('btn-next').innerText = 'Завершить';
+            } else {
+                document.getElementById('btn-next').innerText = 'Далее';
+            }
+            document.getElementById('btn-next').onclick = nextQuestion;
+        } else if (q.type === 'single') {
+            // single checks immediately, so next button will show after check
+        }
+    }
+
+    // --- ANSWER HANDLERS ---
+    function selectSingle(qId, idx) {
+        let q = currentQuestions.find(x => x.id === qId);
+        let isCorrect = idx === q.correct;
+        sessionAnswers[qId] = { answered: true, isCorrect: isCorrect, selected: [idx] };
+        
+        // Update stats
+        updateGlobalStats(qId, isCorrect);
+        
+        renderQuestion(); // Re-render to show result
+    }
+
+    function toggleMulti(qId, idx, btn) {
+        btn.classList.toggle('selected');
+    }
+
+    function checkMulti(q) {
+        let selected = [];
+        document.querySelectorAll('#q-input-area .option-btn').forEach((btn, i) => {
+            if (btn.classList.contains('selected')) selected.push(i);
+        });
+        if (selected.length === 0) return alert("Выберите хотя бы один вариант!");
+        
+        let isCorrect = selected.length === q.correct.length && selected.every(i => q.correct.includes(i));
+        sessionAnswers[q.id] = { answered: true, isCorrect: isCorrect, selected: selected };
+        updateGlobalStats(q.id, isCorrect);
+        renderQuestion();
+    }
+
+    function checkDropdown(q) {
+        let selected = [];
+        let allFilled = true;
+        q.blanks.forEach((b, i) => {
+            let sel = document.getElementById(`blank-${q.id}-${i}`);
+            selected.push(sel.value);
+        });
+        
+        let isCorrect = true;
+        q.blanks.forEach((b, i) => {
+            if (selected[i] !== b.options[b.correct]) isCorrect = false;
+        });
+        
+        sessionAnswers[q.id] = { answered: true, isCorrect: isCorrect, selected: selected };
+        updateGlobalStats(q.id, isCorrect);
+        renderQuestion();
+    }
+
+    function checkMatching(q) {
+        let selected = [];
+        q.pairs.forEach((p, i) => {
+            let sel = document.getElementById(`match-${q.id}-${i}`);
+            selected.push(sel.value);
+        });
+        
+        let isCorrect = true;
+        q.pairs.forEach((p, i) => {
+            if (selected[i] !== p.right) isCorrect = false;
+        });
+        
+        sessionAnswers[q.id] = { answered: true, isCorrect: isCorrect, selected: selected };
+        updateGlobalStats(q.id, isCorrect);
+        renderQuestion();
+    }
+
+    function checkSequence(q) {
+        let selected = [];
+        q.items.forEach((item, i) => {
+            let sel = document.getElementById(`seq-${q.id}-${i}`);
+            selected.push(parseInt(sel.value));
+        });
+        
+        let isCorrect = true;
+        q.items.forEach((item, i) => {
+            if (selected[i] !== (q.items.indexOf(item) + 1)) isCorrect = false;
+        });
+        
+        sessionAnswers[q.id] = { answered: true, isCorrect: isCorrect, selected: selected };
+        updateGlobalStats(q.id, isCorrect);
+        renderQuestion();
+    }
+
+    function checkCategory(q) {
+        let selected = [];
+        q.items.forEach((item, i) => {
+            let sel = document.getElementById(`cat-${q.id}-${i}`);
+            selected.push(parseInt(sel.value));
+        });
+        
+        let isCorrect = true;
+        q.items.forEach((item, i) => {
+            if (selected[i] !== item.cat) isCorrect = false;
+        });
+        
+        sessionAnswers[q.id] = { answered: true, isCorrect: isCorrect, selected: selected };
+        updateGlobalStats(q.id, isCorrect);
+        renderQuestion();
+    }
+
+    // --- STATS UPDATE ---
+    function updateGlobalStats(qId, isCorrect) {
+        let stats = getStats();
+        if (isCorrect) stats.correct++;
+        else stats.wrong++;
+        
+        if (!stats.history[qId]) stats.history[qId] = { correct: 0, wrong: 0, lastCorrect: null };
+        if (isCorrect) stats.history[qId].correct++;
+        else stats.history[qId].wrong++;
+        stats.history[qId].lastCorrect = isCorrect;
+        
+        saveStats(stats);
+    }
+
+    // --- NAVIGATION ---
+    function nextQuestion() {
+        currentIndex++;
+        if (currentIndex >= currentQuestions.length) {
+            finishQuiz();
+        } else {
+            renderQuestion();
+        }
+    }
+
+    function prevQuestion() {
+        if (currentIndex > 0) {
+            currentIndex--;
+            renderQuestion();
+        }
+    }
+
+    function skipQuestion() {
+        nextQuestion();
+    }
+
+    function toggleHard() {
+        let q = currentQuestions[currentIndex];
+        let stats = getStats();
+        let idx = stats.hard.indexOf(q.id);
+        if (idx > -1) {
+            stats.hard.splice(idx, 1);
+        } else {
+            stats.hard.push(q.id);
+        }
+        saveStats(stats);
+        renderQuestion();
+    }
+
+    function finishEarly() {
+        if (confirm("Вы уверены, что хотите завершить?")) {
+            finishQuiz();
+        }
+    }
+
+    function finishQuiz() {
+        showScreen('results-screen');
+        
+        let total = currentQuestions.length;
+        let correctCount = 0;
+        let errorsHtml = '';
+        let topicStats = {};
+        
+        currentQuestions.forEach(q => {
+            let ans = sessionAnswers[q.id];
+            if (ans && ans.isCorrect) {
+                correctCount++;
+                if (!topicStats[q.topic]) topicStats[q.topic] = { c: 0, t: 0 };
+                topicStats[q.topic].c++;
+            } else {
+                errorsHtml += `<li style="margin-bottom:10px;">
+                    <strong>Вопрос:</strong> ${q.text}<br>
+                    <span style="color: var(--error);">Ваш ответ: ${ans ? 'неверно' : 'пропущен'}</span><br>
+                    <span style="color: var(--success);">Правильный ответ: ${getCorrectAnswerText(q)}</span>
+                    <div style="font-size: 13px; color: #666; margin-top: 5px;">${q.explanation || ''}</div>
+                </li>`;
+            }
+            if (!topicStats[q.topic]) topicStats[q.topic] = { c: 0, t: 0 };
+            topicStats[q.topic].t++;
+        });
+
+        let percent = Math.round((correctCount / total) * 100);
+        
+        let statsHtml = `<h3>Результат: ${correctCount} из ${total} (${percent}%)</h3>`;
+        statsHtml += `<p>Темы:</p><ul>`;
+        for (let t in topicStats) {
+            statsHtml += `<li>${t}: ${topicStats[t].c} из ${topicStats[t].t}</li>`;
+        }
+        statsHtml += `</ul>`;
+        
+        document.getElementById('result-stats').innerHTML = statsHtml;
+        
+        if (errorsHtml) {
+            document.getElementById('result-errors').innerHTML = `<h4>Ошибки:</h4><ul>${errorsHtml}</ul>`;
+        } else {
+            document.getElementById('result-errors').innerHTML = `<p style="color: var(--success); font-weight: bold;">Все ответы верны!</p>`;
+        }
+    }
+
+    function getCorrectAnswerText(q) {
+        if (q.type === 'single') return q.options[q.correct];
+        if (q.type === 'multi') return q.correct.map(i => q.options[i]).join(', ');
+        if (q.type === 'dropdown') return q.blanks.map(b => b.options[b.correct]).join(', ');
+        if (q.type === 'matching') return q.pairs.map(p => `${p.left} → ${p.right}`).join('; ');
+        if (q.type === 'sequence') return q.items.map((item, i) => `${i+1}. ${item}`).join('; ');
+        if (q.type === 'category') return q.items.map((item, i) => `${item.text} → ${q.categories[item.cat]}`).join('; ');
+        return '';
+    }
+
+    function resetProgress() {
+        if (confirm("Вы уверены, что хотите сбросить весь прогресс? Это действие необратимо.")) {
+            localStorage.removeItem('im_stats');
+            initMenu();
+            alert("Прогресс сброшен.");
+        }
+    }
+
+    // --- INIT ON LOAD ---
+    window.onload = initMenu;
+
+</script>
+</body>
+</html>
