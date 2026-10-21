@@ -6,18 +6,19 @@
     <title>Имитационное моделирование | Тренажёр</title>
     <style>
         :root {
-            --bg: #090909;
-            --card: #141414;
-            --card-secondary: #1B1B1B;
-            --surface: #222222;
-            --text: #FFFFFF;
-            --text-muted: #A3A3A3;
-            --border: rgba(255,255,255,0.12);
-            --border-active: rgba(255,255,255,0.35);
+            --bg: #F5F5F7;
+            --card: #FFFFFF;
+            --card-secondary: #FAFAFC;
+            --text: #1D1D1F;
+            --text-muted: #86868B;
+            --border: #D2D2D7;
+            --border-active: #86868B;
+            --primary: #0071E3;
+            --primary-hover: #0077ED;
             --success: #34C759;
-            --success-bg: rgba(52, 199, 89, 0.15);
+            --success-bg: #EBF9EE;
             --error: #FF3B30;
-            --error-bg: rgba(255, 59, 48, 0.15);
+            --error-bg: #FFF0EF;
             --radius: 12px;
             --radius-lg: 20px;
         }
@@ -53,7 +54,7 @@
 
         /* Typography */
         h1, h2, h3, h4 { font-weight: 600; letter-spacing: -0.02em; }
-        h1 { font-size: 28px; margin-bottom: 8px; text-align: center; }
+        h1 { font-size: 28px; margin-bottom: 8px; text-align: center; color: var(--text); }
         h2 { font-size: 22px; margin-bottom: 16px; text-align: center; }
         p { color: var(--text-muted); font-size: 15px; }
 
@@ -82,7 +83,7 @@
             border: none;
             border-radius: var(--radius);
             font-size: 16px;
-            font-weight: 600;
+            font-weight: 500;
             cursor: pointer;
             transition: all 0.2s ease;
             display: flex;
@@ -96,25 +97,26 @@
         button:active { transform: scale(0.98); }
 
         .btn-primary {
-            background: var(--text);
-            color: var(--bg);
+            background: var(--primary);
+            color: #FFFFFF;
         }
-        .btn-primary:hover { background: #e0e0e0; }
-        .btn-primary:disabled { background: #333; color: #666; cursor: not-allowed; }
+        .btn-primary:hover { background: var(--primary-hover); }
+        .btn-primary:disabled { background: #E5E5EA; color: #AEAEB2; cursor: not-allowed; }
 
         .btn-secondary {
-            background: transparent;
+            background: var(--card);
             color: var(--text);
             border: 1px solid var(--border);
         }
-        .btn-secondary:hover { border-color: var(--border-active); background: var(--surface); }
+        .btn-secondary:hover { border-color: var(--border-active); background: var(--bg); }
         .btn-secondary:disabled { opacity: 0.5; cursor: not-allowed; }
 
         .btn-text {
             background: transparent;
             color: var(--text-muted);
             padding: 8px 12px;
-            font-size: 14px;
+            font-size: 15px;
+            font-weight: 500;
         }
         .btn-text:hover { color: var(--text); }
 
@@ -130,7 +132,7 @@
             background: var(--card);
             border-radius: var(--radius-lg);
             padding: 24px;
-            border: 1px solid var(--border);
+            box-shadow: 0 4px 24px rgba(0,0,0,0.04);
             display: flex;
             flex-direction: column;
             gap: 16px;
@@ -174,24 +176,25 @@
         }
         .topic-list input[type="checkbox"] {
             appearance: none;
-            width: 20px;
-            height: 20px;
+            width: 22px;
+            height: 22px;
             border: 2px solid var(--border-active);
-            border-radius: 4px;
+            border-radius: 6px;
             background: transparent;
             cursor: pointer;
             position: relative;
+            transition: all 0.2s;
         }
         .topic-list input[type="checkbox"]:checked {
-            background: var(--text);
-            border-color: var(--text);
+            background: var(--primary);
+            border-color: var(--primary);
         }
         .topic-list input[type="checkbox"]:checked::after {
             content: '';
             position: absolute;
-            top: 2px; left: 6px;
+            top: 3px; left: 7px;
             width: 5px; height: 10px;
-            border: solid var(--bg);
+            border: solid #FFF;
             border-width: 0 2px 2px 0;
             transform: rotate(45deg);
         }
@@ -204,20 +207,21 @@
             font-size: 14px;
             color: var(--text-muted);
             margin-bottom: 12px;
+            font-weight: 500;
         }
 
         .progress-container {
             width: 100%;
-            height: 4px;
-            background: var(--border);
-            border-radius: 2px;
+            height: 6px;
+            background: #E5E5EA;
+            border-radius: 3px;
             overflow: hidden;
             margin-bottom: 24px;
         }
 
         .progress-bar {
             height: 100%;
-            background: var(--text);
+            background: var(--primary);
             width: 0%;
             transition: width 0.3s ease;
         }
@@ -231,24 +235,26 @@
 
         .tag {
             font-size: 12px;
-            background: var(--surface);
-            padding: 4px 10px;
-            border-radius: 12px;
+            background: var(--card-secondary);
+            padding: 6px 12px;
+            border-radius: 20px;
             color: var(--text-muted);
             border: 1px solid var(--border);
+            font-weight: 500;
         }
 
         .hard-btn.active {
-            color: #FFD60A;
-            border-color: #FFD60A;
-            background: rgba(255, 214, 10, 0.1);
+            color: #FF9500;
+            border-color: #FF9500;
+            background: rgba(255, 149, 0, 0.1);
         }
 
         .question-text {
-            font-size: 20px;
-            font-weight: 500;
-            line-height: 1.4;
+            font-size: 22px;
+            font-weight: 600;
+            line-height: 1.3;
             margin-bottom: 24px;
+            color: var(--text);
         }
 
         /* Options */
@@ -260,11 +266,12 @@
 
         .option-btn {
             background: var(--card);
-            border: 1px solid var(--border);
+            border: 2px solid var(--border);
             border-radius: var(--radius);
             padding: 16px;
             text-align: left;
             font-size: 16px;
+            font-weight: 500;
             cursor: pointer;
             transition: all 0.2s ease;
             color: var(--text);
@@ -280,8 +287,9 @@
         }
 
         .option-btn.selected {
-            border-color: var(--text);
-            background: var(--surface);
+            border-color: var(--primary);
+            background: rgba(0, 113, 227, 0.05);
+            color: var(--primary);
         }
 
         .option-btn.correct {
@@ -301,35 +309,36 @@
         }
 
         .checkbox-mock {
-            width: 20px;
-            height: 20px;
+            width: 22px;
+            height: 22px;
             border: 2px solid var(--border-active);
-            border-radius: 4px;
+            border-radius: 6px;
             flex-shrink: 0;
             display: flex;
             justify-content: center;
             align-items: center;
             transition: all 0.2s;
+            background: var(--card);
         }
 
         .option-btn.selected .checkbox-mock {
-            background: var(--text);
-            border-color: var(--text);
+            background: var(--primary);
+            border-color: var(--primary);
         }
         .option-btn.selected .checkbox-mock::after {
             content: '✓';
-            color: var(--bg);
+            color: #FFF;
             font-size: 14px;
             font-weight: bold;
         }
 
         .option-btn.correct .checkbox-mock { border-color: var(--success); background: var(--success); }
-        .option-btn.correct .checkbox-mock::after { content: '✓'; color: #000; font-size: 14px; font-weight: bold; }
+        .option-btn.correct .checkbox-mock::after { content: '✓'; color: #FFF; font-size: 14px; font-weight: bold; }
         .option-btn.incorrect .checkbox-mock { border-color: var(--error); background: var(--error); }
-        .option-btn.incorrect .checkbox-mock::after { content: '✕'; color: #000; font-size: 12px; font-weight: bold; }
+        .option-btn.incorrect .checkbox-mock::after { content: '✕'; color: #FFF; font-size: 12px; font-weight: bold; }
 
         .marker-icon {
-            font-size: 16px;
+            font-size: 18px;
             font-weight: bold;
             margin-left: auto;
         }
@@ -339,27 +348,28 @@
             width: 100%;
             padding: 14px 16px;
             background: var(--card);
-            border: 1px solid var(--border);
+            border: 2px solid var(--border);
             border-radius: var(--radius);
             color: var(--text);
             font-size: 16px;
+            font-weight: 500;
             outline: none;
             cursor: pointer;
             appearance: none;
-            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23A3A3A3' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2386868B' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
             background-repeat: no-repeat;
             background-position: right 16px center;
             background-size: 16px;
             transition: border-color 0.2s;
         }
 
-        select:focus { border-color: var(--border-active); }
+        select:focus { border-color: var(--primary); }
         select:disabled { opacity: 0.7; cursor: default; }
-        select.correct-select { border-color: var(--success); background-color: var(--success-bg); }
-        select.incorrect-select { border-color: var(--error); background-color: var(--error-bg); }
+        select.correct-select { border-color: var(--success); background-color: var(--success-bg); color: var(--success); }
+        select.incorrect-select { border-color: var(--error); background-color: var(--error-bg); color: var(--error); }
 
         .dropdown-block { margin-bottom: 12px; }
-        .dropdown-hint { font-size: 13px; color: var(--success); margin-top: 4px; display: block; }
+        .dropdown-hint { font-size: 14px; color: var(--success); margin-top: 6px; display: block; font-weight: 500; }
 
         .match-row, .sequence-row {
             display: flex;
@@ -369,12 +379,13 @@
             background: var(--card-secondary);
             padding: 12px;
             border-radius: var(--radius);
-            border: 1px solid transparent;
+            border: 2px solid transparent;
         }
 
         .match-row .term, .sequence-row .text {
             flex: 1;
             font-size: 15px;
+            font-weight: 500;
         }
 
         .match-row select, .sequence-row select {
@@ -386,8 +397,8 @@
 
         .sequence-row select.num-select { flex: none; width: 70px; }
         
-        .match-row.has-error, .sequence-row.has-error { border-color: var(--error); }
-        .match-row.is-correct, .sequence-row.is-correct { border-color: var(--success); }
+        .match-row.has-error, .sequence-row.has-error { border-color: var(--error); background: var(--error-bg); }
+        .match-row.is-correct, .sequence-row.is-correct { border-color: var(--success); background: var(--success-bg); }
 
         /* Feedback */
         .feedback-box {
@@ -403,13 +414,13 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        .feedback-box.correct { background: var(--success-bg); border: 1px solid rgba(52, 199, 89, 0.3); }
-        .feedback-box.incorrect { background: var(--error-bg); border: 1px solid rgba(255, 59, 48, 0.3); }
+        .feedback-box.correct { background: var(--success-bg); border: 2px solid rgba(52, 199, 89, 0.3); }
+        .feedback-box.incorrect { background: var(--error-bg); border: 2px solid rgba(255, 59, 48, 0.3); }
         
-        .feedback-title { font-weight: 600; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
+        .feedback-title { font-weight: 600; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; font-size: 16px; }
         .feedback-title.correct { color: var(--success); }
         .feedback-title.incorrect { color: var(--error); }
-        .feedback-text { color: var(--text-muted); font-size: 14px; }
+        .feedback-text { color: var(--text); font-size: 14px; line-height: 1.4; }
 
         /* Actions */
         .actions-bar {
@@ -427,7 +438,7 @@
             padding: 32px 20px;
             background: var(--card);
             border-radius: var(--radius-lg);
-            border: 1px solid var(--border);
+            box-shadow: 0 4px 24px rgba(0,0,0,0.04);
             margin-bottom: 20px;
         }
 
@@ -437,9 +448,10 @@
             letter-spacing: -2px;
             line-height: 1;
             margin-bottom: 8px;
+            color: var(--primary);
         }
 
-        .result-subtitle { color: var(--text-muted); font-size: 16px; }
+        .result-subtitle { color: var(--text-muted); font-size: 16px; font-weight: 500; }
 
         .result-grid {
             display: grid;
@@ -461,25 +473,25 @@
         }
 
         .result-item .val { font-size: 24px; font-weight: 700; }
-        .result-item .lbl { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; }
+        .result-item .lbl { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; font-weight: 600; }
 
         .error-list {
             background: var(--card);
             border-radius: var(--radius-lg);
-            padding: 20px;
-            border: 1px solid var(--border);
+            padding: 24px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.04);
         }
         
-        .error-list h4 { margin-bottom: 16px; }
+        .error-list h4 { margin-bottom: 16px; font-size: 18px; }
         
         .error-item {
             padding: 16px 0;
             border-bottom: 1px solid var(--border);
         }
         .error-item:last-child { border-bottom: none; }
-        .error-q { font-weight: 500; margin-bottom: 8px; }
-        .error-ans { font-size: 14px; color: var(--text-muted); display: flex; flex-direction: column; gap: 4px; }
-        .error-ans span.correct { color: var(--success); }
+        .error-q { font-weight: 600; margin-bottom: 8px; font-size: 15px; }
+        .error-ans { font-size: 14px; display: flex; flex-direction: column; gap: 4px; }
+        .error-ans span.correct { color: var(--success); font-weight: 500; }
 
         /* Utilities */
         .spacer { height: 10px; }
@@ -488,15 +500,17 @@
         
         details summary {
             cursor: pointer;
-            padding: 12px;
+            padding: 14px;
             background: var(--card-secondary);
             border-radius: var(--radius);
-            font-weight: 500;
+            font-weight: 600;
             list-style: none;
+            border: 1px solid var(--border);
+            color: var(--text);
         }
         details summary::-webkit-details-marker { display: none; }
-        details[open] summary { border-bottom-left-radius: 0; border-bottom-right-radius: 0; margin-bottom: 0; }
-        details > div { padding: 12px; background: var(--card); border: 1px solid var(--border); border-top: none; border-bottom-left-radius: var(--radius); border-bottom-right-radius: var(--radius); }
+        details[open] summary { border-bottom-left-radius: 0; border-bottom-right-radius: 0; margin-bottom: 0; border-bottom: none; }
+        details > div { padding: 16px; background: var(--card); border: 1px solid var(--border); border-top: none; border-bottom-left-radius: var(--radius); border-bottom-right-radius: var(--radius); }
     </style>
 </head>
 <body>
@@ -566,7 +580,7 @@
         <div class="actions-bar">
             <button class="btn-secondary" id="btn-prev" onclick="prevQuestion()">Назад</button>
             <button class="btn-secondary" id="btn-skip" onclick="skipQuestion()">Пропустить</button>
-            <button class="btn-primary hidden" id="btn-check" onclick="checkCurrentAnswer()">Проверить</button>
+            <button class="btn-primary hidden" id="btn-check" onclick="checkCurrentAnswer()">Проверить ответ</button>
             <button class="btn-primary hidden" id="btn-next" onclick="nextQuestion()">Далее</button>
         </div>
     </div>
@@ -580,11 +594,11 @@
         
         <div class="result-grid">
             <div class="result-item">
-                <div class="val" id="res-correct">0</div>
+                <div class="val" id="res-correct" style="color:var(--success)">0</div>
                 <div class="lbl">Верно</div>
             </div>
             <div class="result-item">
-                <div class="val" id="res-incorrect">0</div>
+                <div class="val" id="res-incorrect" style="color:var(--error)">0</div>
                 <div class="lbl">Ошибки</div>
             </div>
             <div class="result-item">
@@ -967,14 +981,13 @@
     let currentIndex = 0;
     let sessionAnswers = {}; // qId -> { status, selected, isCorrect }
     let isExamMode = false;
-    let initialTopicList = [];
 
     // --- LOCALSTORAGE ---
     function getStats() {
-        let s = localStorage.getItem('im_stats_v2');
+        let s = localStorage.getItem('im_stats_v3');
         if (!s) {
             s = { attempts: 0, totalCorrect: 0, totalWrong: 0, history: {}, hard: [] };
-            localStorage.setItem('im_stats_v2', JSON.stringify(s));
+            localStorage.setItem('im_stats_v3', JSON.stringify(s));
         } else {
             s = JSON.parse(s);
         }
@@ -985,7 +998,7 @@
 
     function saveStats(s) {
         try {
-            localStorage.setItem('im_stats_v2', JSON.stringify(s));
+            localStorage.setItem('im_stats_v3', JSON.stringify(s));
         } catch(e) {
             console.warn("Не удалось сохранить прогресс.");
         }
@@ -1014,7 +1027,6 @@
         
         // Topics
         const topics = [...new Set(QUESTIONS.map(q => q.topic))];
-        if (initialTopicList.length === 0) initialTopicList = topics;
         let topicHtml = '';
         topics.forEach(t => {
             topicHtml += `<label><input type="checkbox" value="${t}" class="topic-cb"> ${t}</label>`;
@@ -1062,22 +1074,15 @@
         // Deep copy & Shuffle
         currentQuestions = shuffle(pool).map(q => {
             let newQ = JSON.parse(JSON.stringify(q));
-            
-            // Shuffle options
             if (newQ.type === 'single' || newQ.type === 'multi') {
-                let correctVals = newQ.type === 'single' ? [newQ.correct] : newQ.correct;
                 newQ.options = shuffle(newQ.options);
-                // We rely on string values now, so no index remapping needed!
             }
-            // Shuffle matching
             if (newQ.type === 'matching') {
                 newQ.pairs = shuffle(newQ.pairs);
             }
-            // Shuffle sequence
             if (newQ.type === 'sequence') {
                 newQ.items = shuffle(newQ.items);
             }
-            // Shuffle category
             if (newQ.type === 'category') {
                 newQ.items = shuffle(newQ.items);
             }
@@ -1154,8 +1159,8 @@
                 } else {
                     btn.onclick = () => {
                         sessionAnswers[q.id] = { status: 'answered', selected: [opt] };
-                        renderQuestion(); // Re-render to show selection
-                        checkCurrentAnswer(); // Auto check for single
+                        renderQuestion();
+                        checkCurrentAnswer();
                     };
                 }
                 container.appendChild(btn);
@@ -1178,6 +1183,8 @@
                     btn.disabled = true;
                     btn.classList.add('disabled');
                     let isCorrectOpt = q.correct.includes(opt);
+                    
+                    // Логика отображения для множественного выбора
                     if (isCorrectOpt) {
                         btn.classList.add('correct');
                         innerHtml += `<span class="marker-icon" style="color:var(--success)">✓</span>`;
@@ -1204,7 +1211,8 @@
 
         } else if (q.type === 'dropdown') {
             let div = document.createElement('div');
-            div.innerHTML = q.text;
+            // Replace [1], [2] with placeholders for visual
+            div.innerHTML = q.text.replace(/\[\d\]/g, '<span style="color:var(--primary); font-weight:bold;">[...]</span>');
             area.appendChild(div);
             
             q.blanks.forEach((blank, i) => {
@@ -1213,6 +1221,15 @@
                 
                 let sel = document.createElement('select');
                 sel.id = `blank-${q.id}-${i}`;
+                
+                // Добавляем пустой дефолтный вариант
+                let defaultOpt = document.createElement('option');
+                defaultOpt.value = "";
+                defaultOpt.innerText = "— Выберите вариант ответа —";
+                defaultOpt.disabled = true;
+                defaultOpt.selected = !(ans.selected && ans.selected[i]);
+                sel.appendChild(defaultOpt);
+
                 let opts = shuffle(blank.options);
                 opts.forEach(o => {
                     let option = document.createElement('option');
@@ -1259,6 +1276,15 @@
                 term.innerText = pair.left;
                 
                 let sel = document.createElement('select');
+                
+                // Default empty option
+                let defaultOpt = document.createElement('option');
+                defaultOpt.value = "";
+                defaultOpt.innerText = "— Выбрать —";
+                defaultOpt.disabled = true;
+                defaultOpt.selected = !(ans.selected && ans.selected[idx]);
+                sel.appendChild(defaultOpt);
+
                 let opts = shuffle(q.pairs.map(p => p.right));
                 opts.forEach(o => {
                     let option = document.createElement('option');
@@ -1272,8 +1298,9 @@
                     sel.disabled = true;
                     if (ans.selected[idx] !== pair.right) {
                         let hint = document.createElement('span');
-                        hint.style.fontSize = '12px';
+                        hint.style.fontSize = '13px';
                         hint.style.color = 'var(--success)';
+                        hint.style.fontWeight = '600';
                         hint.innerText = ` (${pair.right})`;
                         sel.parentNode.insertBefore(hint, sel.nextSibling);
                     }
@@ -1303,6 +1330,14 @@
 
                 let sel = document.createElement('select');
                 sel.className = 'num-select';
+                
+                let defaultOpt = document.createElement('option');
+                defaultOpt.value = "";
+                defaultOpt.innerText = "-";
+                defaultOpt.disabled = true;
+                defaultOpt.selected = !(ans.selected && ans.selected[idx]);
+                sel.appendChild(defaultOpt);
+
                 for (let i = 1; i <= q.items.length; i++) {
                     let option = document.createElement('option');
                     option.value = i;
@@ -1319,8 +1354,9 @@
                     sel.disabled = true;
                     if (!isCorr) {
                         let hint = document.createElement('span');
-                        hint.style.fontSize = '12px';
+                        hint.style.fontSize = '13px';
                         hint.style.color = 'var(--success)';
+                        hint.style.fontWeight = '600';
                         hint.innerText = ` (Позиция ${q.items.indexOf(item) + 1})`;
                         text.appendChild(hint);
                     }
@@ -1353,6 +1389,14 @@
                 text.innerText = item.text;
                 
                 let sel = document.createElement('select');
+                
+                let defaultOpt = document.createElement('option');
+                defaultOpt.value = "";
+                defaultOpt.innerText = "— Выбрать —";
+                defaultOpt.disabled = true;
+                defaultOpt.selected = !(ans.selected && ans.selected[idx]);
+                sel.appendChild(defaultOpt);
+
                 q.categories.forEach(cat => {
                     let option = document.createElement('option');
                     option.value = cat;
@@ -1365,8 +1409,9 @@
                     sel.disabled = true;
                     if (!isCorr) {
                         let hint = document.createElement('span');
-                        hint.style.fontSize = '12px';
+                        hint.style.fontSize = '13px';
                         hint.style.color = 'var(--success)';
+                        hint.style.fontWeight = '600';
                         hint.innerText = ` (${item.cat})`;
                         sel.parentNode.insertBefore(hint, sel.nextSibling);
                     }
@@ -1412,9 +1457,8 @@
             btnNext.classList.remove('hidden');
             btnNext.innerText = (currentIndex === currentQuestions.length - 1) ? 'Завершить' : 'Далее';
         } else if (q.type === 'single') {
-            // Auto checked, so no check button needed
+            // Auto checked
         } else {
-            // Multi, dropdown, matching, sequence, category
             btnCheck.classList.remove('hidden');
         }
     }
@@ -1425,17 +1469,22 @@
         let ans = sessionAnswers[q.id];
         if (!ans || ans.status === 'unanswered') return alert("Выберите ответ!");
         
+        // Check if all blanks are filled
+        if (q.type === 'dropdown' && ans.selected.length !== q.blanks.length) return alert("Заполните все пропуски!");
+        if (q.type === 'matching' && ans.selected.length !== q.pairs.length) return alert("Сопоставьте все элементы!");
+        if (q.type === 'sequence' && ans.selected.length !== q.items.length) return alert("Укажите позиции для всех элементов!");
+        if (q.type === 'category' && ans.selected.length !== q.items.length) return alert("Распределите все элементы по категориям!");
+
         let isCorrect = false;
         
         if (q.type === 'single') {
             isCorrect = ans.selected[0] === q.correct;
         } else if (q.type === 'multi') {
-            // Must match exactly
+            // Строгое совпадение: выбраны все правильные и нет лишних
             let s = ans.selected.sort();
             let c = q.correct.slice().sort();
             isCorrect = s.length === c.length && s.every((val, index) => val === c[index]);
         } else if (q.type === 'dropdown') {
-            // Check every blank
             isCorrect = q.blanks.every((b, i) => ans.selected[i] === b.correct);
         } else if (q.type === 'matching') {
             isCorrect = q.pairs.every((p, i) => ans.selected[i] === p.right);
@@ -1481,7 +1530,7 @@
     }
 
     function skipQuestion() {
-        nextQuestion(); // Answer remains 'unanswered' in session
+        nextQuestion(); 
     }
 
     function toggleHard() {
@@ -1521,7 +1570,7 @@
                     <div class="error-ans">
                         <span>Ваш ответ: Неверно</span>
                         <span class="correct">Правильно: ${getCorrectAnswerText(q)}</span>
-                        <span style="font-size:12px; margin-top:4px;">${q.explanation || ''}</span>
+                        <span style="font-size:13px; margin-top:4px; color:var(--text-muted);">${q.explanation || ''}</span>
                     </div>
                 </div>`;
             } else if (ans.status === 'answered') {
@@ -1545,7 +1594,6 @@
             }
         });
 
-        // Percentage only based on checked questions
         let checkedTotal = correctCount + incorrectCount;
         let percent = checkedTotal > 0 ? Math.round((correctCount / checkedTotal) * 100) : 0;
 
@@ -1577,7 +1625,7 @@
 
     function resetProgress() {
         if (confirm("Сбросить весь прогресс? Это действие необратимо.")) {
-            localStorage.removeItem('im_stats_v2');
+            localStorage.removeItem('im_stats_v3');
             initMenu();
         }
     }
